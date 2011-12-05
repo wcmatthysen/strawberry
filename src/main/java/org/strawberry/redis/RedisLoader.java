@@ -23,20 +23,43 @@ import static org.strawberry.util.JedisUtil.using;
  *
  * @author Wiehann Matthysen
  */
-public class RedisCacheLoader extends CacheLoader<Field, Object> {
+public class RedisLoader extends CacheLoader<Field, Option> {
 
     private static final String STRING = "string";
     private static final String HASH = "hash";
     private static final String LIST = "list";
+    
     private final JedisPool pool;
 
-    public RedisCacheLoader(JedisPool pool) {
+    public RedisLoader(JedisPool pool) {
         this.pool = pool;
     }
 
     @Override
     public Option load(Field field) throws Exception {
         return loadFromRedis(this.pool, field.getType(), field.getAnnotation(Redis.class));
+    }
+    
+    private static Object nonNullValueOf(Class<?> type) {
+        Object value = null;
+        if (type.equals(String.class)) {
+            value = "";
+        } else if (type.equals(byte[].class)) {
+            value = new byte[]{};
+        } else if (type.equals(Byte[].class)) {
+            value = new Byte[]{};
+        } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
+            value = false;
+        } else if (type.equals(int.class) || type.equals(Integer.class)) {
+            value = 0;
+        } else if (type.equals(double.class) || type.equals(Double.class)) {
+            value = 0.0;
+        } else if (type.equals(Map.class)) {
+            value = Collections.EMPTY_MAP;
+        } else if (type.equals(List.class)) {
+            value = Collections.EMPTY_LIST;
+        }
+        return value;
     }
 
     private static Option loadFromRedis(JedisPool pool, final Class<?> fieldType, final Redis annotation) {
@@ -53,10 +76,9 @@ public class RedisCacheLoader extends CacheLoader<Field, Object> {
 
                 Set<String> redisKeys = jedis.keys(pattern);
                 if (includeKeys) {
-                    if (redisKeys.size() == 1) {
-                        String redisKey = Iterators.getOnlyElement(redisKeys.iterator());
+                    if (fieldType.equals(Map.class)) {
                         Map<String, Object> map = Maps.newLinkedHashMap();
-                        if (fieldType.equals(Map.class)) {
+                        for (String redisKey : redisKeys) {
                             if (jedis.type(redisKey).equals(STRING)) {
                                 map.put(redisKey, jedis.get(redisKey));
                             } else if (jedis.type(redisKey).equals(HASH)) {
@@ -66,24 +88,6 @@ public class RedisCacheLoader extends CacheLoader<Field, Object> {
                             }
                         }
                         value = map;
-                    } else if (redisKeys.size() > 1) {
-                        if (fieldType.equals(Map.class)) {
-                            Map<String, Object> map = Maps.newLinkedHashMap();
-                            for (String redisKey : redisKeys) {
-                                if (jedis.type(redisKey).equals(STRING)) {
-                                    map.put(redisKey, jedis.get(redisKey));
-                                } else if (jedis.type(redisKey).equals(HASH)) {
-                                    map.put(redisKey, jedis.hgetAll(redisKey));
-                                } else if (jedis.type(redisKey).equals(LIST)) {
-                                    map.put(redisKey, jedis.lrange(redisKey, 0, -1));
-                                }
-                            }
-                            value = map;
-                        }
-                    } else {
-                        if (fieldType.equals(Map.class)) {
-                            value = Collections.EMPTY_MAP;
-                        }
                     }
                 } else {
                     if (redisKeys.size() == 1) {
@@ -151,23 +155,7 @@ public class RedisCacheLoader extends CacheLoader<Field, Object> {
                         }
                     } else {
                         if (!allowNull) {
-                            if (fieldType.equals(String.class)) {
-                                value = "";
-                            } else if (fieldType.equals(byte[].class)) {
-                                value = new byte[]{};
-                            } else if (fieldType.equals(Byte[].class)) {
-                                value = new Byte[]{};
-                            } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                                value = false;
-                            } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-                                value = 0;
-                            } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                                value = 0.0;
-                            } else if (fieldType.equals(Map.class)) {
-                                value = Collections.EMPTY_MAP;
-                            } else if (fieldType.equals(List.class)) {
-                                value = Collections.EMPTY_LIST;
-                            }
+                           value = nonNullValueOf(fieldType);
                         }
                     }
                 }

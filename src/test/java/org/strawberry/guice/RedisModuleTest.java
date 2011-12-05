@@ -1,7 +1,5 @@
 package org.strawberry.guice;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -9,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +14,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.strawberry.redis.RedisCacheLoader;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -149,7 +145,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringWithoutKeyMissingAllowNullClass {
         
-        @Redis(value = "test:non_existent_string", allowNull = true)
+        @Redis("test:non_existent_string")
         private String injectedString;
         
         public String getInjectedString() {
@@ -159,7 +155,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringWithoutKeyMissingClass {
         
-        @Redis("test:non_existent_string")
+        @Redis(value = "test:non_existent_string", allowNull = false)
         private String injectedString;
         
         public String getInjectedString() {
@@ -201,7 +197,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithoutKeyMissingAllowNullClass {
         
-        @Redis(value = "test:non_existent_map", allowNull = true)
+        @Redis("test:non_existent_map")
         private Map<String, String> injectedMap;
         
         public Map<String, String> getInjectedMap() {
@@ -211,7 +207,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithoutKeyMissingClass {
         
-        @Redis("test:non_existent_map")
+        @Redis(value = "test:non_existent_map", allowNull = false)
         private Map<String, String> injectedMap;
         
         public Map<String, String> getInjectedMap() {
@@ -253,7 +249,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListWithoutKeyMissingAllowNullClass {
         
-        @Redis(value = "test:non_existent_list", allowNull = true)
+        @Redis("test:non_existent_list")
         private List<String> injectedList;
         
         public List<String> getInjectedList() {
@@ -263,7 +259,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListWithoutKeyMissingClass {
         
-        @Redis("test:non_existent_list")
+        @Redis(value = "test:non_existent_list", allowNull = false)
         private List<String> injectedList;
         
         public List<String> getInjectedList() {
@@ -337,9 +333,7 @@ public class RedisModuleTest extends AbstractModule {
     
     @Override
     protected void configure() {
-        Cache<Field, Object> configCache = CacheBuilder.newBuilder().
-            maximumSize(0).build(new RedisCacheLoader(this.pool));
-        install(new RedisModule(configCache));
+        install(new RedisModule(this.pool));
     }
 
     @Before
