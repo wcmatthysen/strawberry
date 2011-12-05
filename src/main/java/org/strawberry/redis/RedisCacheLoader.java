@@ -46,7 +46,7 @@ public class RedisCacheLoader extends CacheLoader<Field, Object> {
             public Option f(Jedis jedis) {
                 Object value = null;
 
-                String pattern = annotation.pattern();
+                String pattern = annotation.value();
                 boolean includeKeys = annotation.includeKeys();
                 boolean alwaysNest = annotation.alwaysNest();
                 boolean allowNull = annotation.allowNull();

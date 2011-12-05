@@ -18,7 +18,7 @@ import static java.lang.annotation.ElementType.METHOD;
 @Retention(RUNTIME)
 public @interface Redis {
 
-    String pattern();
+    String value();
 
     boolean includeKeys() default false;
 

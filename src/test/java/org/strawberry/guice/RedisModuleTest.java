@@ -39,7 +39,7 @@ public class RedisModuleTest extends AbstractModule {
 
     public static class SingleStringWithoutKeyClass {
 
-        @Redis(pattern = "test:string")
+        @Redis("test:string")
         private String injectedString;
 
         public String getInjectedString() {
@@ -49,7 +49,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SinglePrimitiveByteArrayWithoutKeyClass {
         
-        @Redis(pattern = "test:bytes")
+        @Redis("test:bytes")
         private byte[] injectedBytes;
         
         public byte[] getInjectedBytes() {
@@ -59,7 +59,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleByteArrayWithoutKeyClass {
         
-        @Redis(pattern = "test:bytes")
+        @Redis("test:bytes")
         private Byte[] injectedBytes;
         
         public Byte[] getInjectedBytes() {
@@ -69,7 +69,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SinglePrimitiveBooleanWithoutKeyClass {
         
-        @Redis(pattern = "test:boolean")
+        @Redis("test:boolean")
         private boolean injectedBoolean;
         
         public boolean getInjectedBoolean() {
@@ -79,7 +79,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleBooleanWithoutKeyClass {
         
-        @Redis(pattern = "test:boolean")
+        @Redis("test:boolean")
         private Boolean injectedBoolean;
         
         public Boolean getInjectedBoolean() {
@@ -89,7 +89,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SinglePrimitiveIntegerWithoutKeyClass {
         
-        @Redis(pattern = "test:integer")
+        @Redis("test:integer")
         private int injectedInteger;
         
         public int getInjectedInteger() {
@@ -99,7 +99,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleIntegerWithoutKeyClass {
         
-        @Redis(pattern = "test:integer")
+        @Redis("test:integer")
         private Integer injectedInteger;
         
         public Integer getInjectedInteger() {
@@ -109,7 +109,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SinglePrimitiveDoubleWithoutKeyClass {
         
-        @Redis(pattern = "test:double")
+        @Redis("test:double")
         private double injectedDouble;
         
         public double getInjectedDouble() {
@@ -119,7 +119,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleDoubleWithoutKeyClass {
         
-        @Redis(pattern = "test:double")
+        @Redis("test:double")
         private Double injectedDouble;
         
         public Double getInjectedDouble() {
@@ -129,7 +129,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringWithKeyClass {
         
-        @Redis(pattern = "test:string", includeKeys = true)
+        @Redis(value = "test:string", includeKeys = true)
         private Map<String, String> injectedString;
         
         public Map<String, String> getInjectedString() {
@@ -139,7 +139,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringInListWithoutKeyClass {
         
-        @Redis(pattern = "test:string")
+        @Redis("test:string")
         private List<String> injectedString;
         
         public List<String> getInjectedString() {
@@ -149,7 +149,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringWithoutKeyMissingAllowNullClass {
         
-        @Redis(pattern = "test:non_existent_string", allowNull = true)
+        @Redis(value = "test:non_existent_string", allowNull = true)
         private String injectedString;
         
         public String getInjectedString() {
@@ -159,7 +159,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleStringWithoutKeyMissingClass {
         
-        @Redis(pattern = "test:non_existent_string")
+        @Redis("test:non_existent_string")
         private String injectedString;
         
         public String getInjectedString() {
@@ -171,7 +171,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithoutKeyClass {
 
-        @Redis(pattern = "test:map")
+        @Redis("test:map")
         private Map<String, String> injectedMap;
 
         public Map<String, String> getInjectedMap() {
@@ -181,7 +181,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithKeyClass {
         
-        @Redis(pattern = "test:map", includeKeys = true)
+        @Redis(value = "test:map", includeKeys = true)
         private Map<String, Map<String, String>> injectedMap;
         
         public Map<String, Map<String, String>> getInjectedMap() {
@@ -191,7 +191,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapInListWithoutKeyClass {
         
-        @Redis(pattern = "test:map")
+        @Redis("test:map")
         private List<Map<String, String>> injectedMap;
         
         public List<Map<String, String>> getInjectedMap() {
@@ -201,7 +201,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithoutKeyMissingAllowNullClass {
         
-        @Redis(pattern = "test:non_existent_map", allowNull = true)
+        @Redis(value = "test:non_existent_map", allowNull = true)
         private Map<String, String> injectedMap;
         
         public Map<String, String> getInjectedMap() {
@@ -211,7 +211,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleMapWithoutKeyMissingClass {
         
-        @Redis(pattern = "test:non_existent_map")
+        @Redis("test:non_existent_map")
         private Map<String, String> injectedMap;
         
         public Map<String, String> getInjectedMap() {
@@ -223,7 +223,7 @@ public class RedisModuleTest extends AbstractModule {
 
     public static class SingleListWithoutKeyClass {
 
-        @Redis(pattern = "test:list")
+        @Redis("test:list")
         private List<String> injectedList;
 
         public List<String> getInjectedList() {
@@ -233,7 +233,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListWithKeyClass {
         
-        @Redis(pattern = "test:list", includeKeys = true)
+        @Redis(value = "test:list", includeKeys = true)
         private Map<String, List<String>> injectedList;
         
         public Map<String, List<String>> getInjectedList() {
@@ -243,7 +243,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListInListWithoutKeyClass {
         
-        @Redis(pattern = "test:list", alwaysNest = true)
+        @Redis(value = "test:list", alwaysNest = true)
         private List<List<String>> injectedList;
         
         public List<List<String>> getInjectedList() {
@@ -253,7 +253,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListWithoutKeyMissingAllowNullClass {
         
-        @Redis(pattern = "test:non_existent_list", allowNull = true)
+        @Redis(value = "test:non_existent_list", allowNull = true)
         private List<String> injectedList;
         
         public List<String> getInjectedList() {
@@ -263,7 +263,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class SingleListWithoutKeyMissingClass {
         
-        @Redis(pattern = "test:non_existent_list")
+        @Redis("test:non_existent_list")
         private List<String> injectedList;
         
         public List<String> getInjectedList() {
@@ -275,7 +275,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiStringsWithoutKeysInjectClass {
         
-        @Redis(pattern = "test:string:*")
+        @Redis("test:string:*")
         private List<String> injectedStrings;
         
         public List<String> getInjectedStrings() {
@@ -285,7 +285,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiStringsWithKeysInjectClass {
         
-        @Redis(pattern = "test:string:*", includeKeys = true)
+        @Redis(value = "test:string:*", includeKeys = true)
         private Map<String, String> injectedStrings;
         
         public Map<String, String> getInjectedStrings() {
@@ -295,7 +295,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiListsWithoutKeysInjectClass {
         
-        @Redis(pattern = "test:list:*")
+        @Redis("test:list:*")
         private List<List<String>> injectedLists;
         
         public List<List<String>> getInjectedLists() {
@@ -305,7 +305,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiListsWithKeysInjectClass {
         
-        @Redis(pattern = "test:list:*", includeKeys = true)
+        @Redis(value = "test:list:*", includeKeys = true)
         private Map<String, List<String>> injectedLists;
         
         public Map<String, List<String>> getInjectedLists() {
@@ -315,7 +315,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiMapsWithoutKeysInjectClass {
         
-        @Redis(pattern = "test:map:*")
+        @Redis("test:map:*")
         private List<Map<String, String>> injectedMaps;
         
         public List<Map<String, String>> getInjectedMaps() {
@@ -325,7 +325,7 @@ public class RedisModuleTest extends AbstractModule {
     
     public static class MultiMapsWithKeysInjectClass {
         
-        @Redis(pattern = "test:map:*", includeKeys = true)
+        @Redis(value = "test:map:*", includeKeys = true)
         private Map<String, Map<String, String>> injectedMaps;
         
         public Map<String, Map<String, String>> getInjectedMaps() {
