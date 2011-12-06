@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  *
  * @author Wiehann Matthysen
  */
-public class RedisMembersInjector<T> implements MembersInjector<T> {
+final class RedisMembersInjector<T> implements MembersInjector<T> {
 
     private final Cache<Field, Option> cache;
     private final Field field;

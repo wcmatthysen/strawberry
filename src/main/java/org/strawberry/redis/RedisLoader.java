@@ -1,11 +1,12 @@
 package org.strawberry.redis;
 
+import com.google.common.collect.Iterables;
 import org.strawberry.util.Patterns;
 import org.apache.commons.lang3.ArrayUtils;
 import com.google.common.cache.CacheLoader;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import fj.F;
 import fj.data.Option;
 import java.lang.reflect.Field;
@@ -23,11 +24,12 @@ import static org.strawberry.util.JedisUtil.using;
  *
  * @author Wiehann Matthysen
  */
-public class RedisLoader extends CacheLoader<Field, Option> {
+public final class RedisLoader extends CacheLoader<Field, Option> {
 
     private static final String STRING = "string";
     private static final String HASH = "hash";
     private static final String LIST = "list";
+    private static final String SET = "set";
     
     private final JedisPool pool;
 
@@ -58,6 +60,62 @@ public class RedisLoader extends CacheLoader<Field, Option> {
             value = Collections.EMPTY_MAP;
         } else if (type.equals(List.class)) {
             value = Collections.EMPTY_LIST;
+        } else if (type.equals(Set.class)) {
+            value = Collections.EMPTY_SET;
+        }
+        return value;
+    }
+    
+    private static Object listValueOf(Jedis jedis, String key, boolean alwaysNest) {
+        Object value = null;
+        String jedisType = jedis.type(key);
+        if (jedisType.equals(STRING)) {
+            value = Lists.newArrayList(jedis.get(key));
+        } else if (jedisType.equals(HASH)) {
+            value = Lists.newArrayList(jedis.hgetAll(key));
+        } else if (jedisType.equals(LIST)) {
+            if (alwaysNest) {
+                List<List<String>> nestedList = Lists.newArrayList();
+                nestedList.add(jedis.lrange(key, 0, -1));
+                value = nestedList;
+            } else {
+                value = jedis.lrange(key, 0, -1);
+            }
+        } else if (jedisType.equals(SET)) {
+            if (alwaysNest) {
+                List<Set<String>> nestedList = Lists.newArrayList();
+                nestedList.add(jedis.smembers(key));
+                value = nestedList;
+            } else {
+                value = Lists.newArrayList(jedis.smembers(key));
+            }
+        }
+        return value;
+    }
+    
+    private static Object setValueOf(Jedis jedis, String key, boolean alwaysNest) {
+        Object value = null;
+        String jedisType = jedis.type(key);
+        if (jedisType.equals(STRING)) {
+            value = Sets.newHashSet(jedis.get(key));
+        } else if (jedisType.equals(HASH)) {
+            value = Sets.newHashSet(jedis.hgetAll(key));
+        } else if (jedisType.equals(LIST)) {
+            if (alwaysNest) {
+                Set<List<String>> nestedSet = Sets.newHashSet();
+                nestedSet.add(jedis.lrange(key, 0, -1));
+                value = nestedSet;
+            } else {
+                value = Sets.newHashSet(jedis.lrange(key, 0, -1));
+            }
+        } else if (jedisType.equals(SET)) {
+            if (alwaysNest) {
+                Set<Set<String>> nestedSet = Sets.newHashSet();
+                nestedSet.add(jedis.smembers(key));
+                value = nestedSet;
+            } else {
+                value = jedis.smembers(key);
+            }
         }
         return value;
     }
@@ -85,13 +143,15 @@ public class RedisLoader extends CacheLoader<Field, Option> {
                                 map.put(redisKey, jedis.hgetAll(redisKey));
                             } else if (jedis.type(redisKey).equals(LIST)) {
                                 map.put(redisKey, jedis.lrange(redisKey, 0, -1));
+                            } else if (jedis.type(redisKey).equals(SET)) {
+                                map.put(redisKey, jedis.smembers(redisKey));
                             }
                         }
                         value = map;
                     }
                 } else {
                     if (redisKeys.size() == 1) {
-                        String redisKey = Iterators.getOnlyElement(redisKeys.iterator());
+                        String redisKey = Iterables.getOnlyElement(redisKeys);
                         if (fieldType.equals(String.class)) {
                             value = jedis.get(redisKey);
                         } else if (fieldType.equals(byte[].class)) {
@@ -104,7 +164,7 @@ public class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Patterns.TRUE.matcher(toConvert).matches();
                             } else {
                                 throw new IllegalArgumentException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to boolean.", toConvert, redisKey));
+                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -112,7 +172,7 @@ public class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Integer.parseInt(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to integer.", toConvert, redisKey));
+                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -120,24 +180,14 @@ public class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Double.parseDouble(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to double.", toConvert, redisKey));
+                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(Map.class)) {
                             value = jedis.hgetAll(redisKey);
                         } else if (fieldType.equals(List.class)) {
-                            if (jedis.type(redisKey).equals(STRING)) {
-                                value = Lists.newArrayList(jedis.get(redisKey));
-                            } else if (jedis.type(redisKey).equals(HASH)) {
-                                value = Lists.newArrayList(jedis.hgetAll(redisKey));
-                            } else if (jedis.type(redisKey).equals(LIST)) {
-                                if (alwaysNest) {
-                                    List<List<String>> nestedList = Lists.newArrayList();
-                                    nestedList.add(jedis.lrange(redisKey, 0, -1));
-                                    value = nestedList;
-                                } else {
-                                    value = jedis.lrange(redisKey, 0, -1);
-                                }
-                            }
+                            value = listValueOf(jedis, redisKey, alwaysNest);
+                        } else if (fieldType.equals(Set.class)) {
+                            value = setValueOf(jedis, redisKey, alwaysNest);
                         }
                     } else if (redisKeys.size() > 1) {
                         if (fieldType.equals(List.class)) {

@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  *
  * @author Wiehann Matthysen
  */
-public class RedisTypeListener implements TypeListener {
+final class RedisTypeListener implements TypeListener {
 
     private final Cache<Field, Option> cache;
 
