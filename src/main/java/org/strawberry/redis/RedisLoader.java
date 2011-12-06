@@ -199,6 +199,8 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                     list.add(jedis.hgetAll(redisKey));
                                 } else if (jedis.type(redisKey).equals(LIST)) {
                                     list.add(jedis.lrange(redisKey, 0, -1));
+                                } else if (jedis.type(redisKey).equals(SET)) {
+                                    list.add(jedis.smembers(redisKey));
                                 }
                             }
                             value = list;
