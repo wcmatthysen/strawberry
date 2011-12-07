@@ -10,7 +10,6 @@ import com.google.common.collect.Sets;
 import fj.F;
 import fj.data.Option;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,11 +56,11 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         } else if (type.equals(double.class) || type.equals(Double.class)) {
             value = 0.0;
         } else if (type.equals(Map.class)) {
-            value = Collections.EMPTY_MAP;
+            value = Maps.newHashMap();
         } else if (type.equals(List.class)) {
-            value = Collections.EMPTY_LIST;
+            value = Lists.newArrayList();
         } else if (type.equals(Set.class)) {
-            value = Collections.EMPTY_SET;
+            value = Sets.newHashSet();
         }
         return value;
     }
@@ -119,7 +118,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         }
         return value;
     }
-
+    
     private static Option loadFromRedis(JedisPool pool, final Class<?> fieldType, final Redis annotation) {
         return using(pool)._do(new F<Jedis, Option>() {
 
