@@ -118,6 +118,28 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
+    public static class MultiHeterogeneousWithoutKeysInjectClass {
+        
+        @Redis(value = "test:heterogeneous:*")
+        private List<Object> injectedObjects;
+        
+        public List<Object> getInjectedObjects() {
+            return this.injectedObjects;
+        }
+    }
+    
+    public static class MultiHeterogeneousWithKeysInjectClass {
+        
+        @Redis(value = "test:heterogeneous:*", includeKeys = true)
+        private Map<String, Object> injectedObjects;
+        
+        public Map<String, Object> getInjectedObjects() {
+            return this.injectedObjects;
+        }
+    }
+    
+    
     @Override
     protected void configure() {
         install(new RedisModule(this.pool));
@@ -315,6 +337,162 @@ public class AggregateInjectionTest extends AbstractModule {
         }
         for (int i = 0; i < 10; ++i) {
             this.jedis.del(String.format("test:set:%s", i));
+        }
+    }
+    
+    
+    
+    @Test
+    public void test_that_multiple_objects_without_keys_are_injected_into_list_of_objects_field() {
+        // Inject some strings.
+        for (int i = 0; i < 3; ++i) {
+            this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
+        }
+        
+        // Inject some maps.
+        for (int i = 3; i < 6; ++i) {
+            Map<String, String> testMap = ImmutableMap.of(
+                String.format("key_%s1", i), String.format("value_%s1", i),
+                String.format("key_%s2", i), String.format("value_%s2", i),
+                String.format("key_%s3", i), String.format("value_%s3", i)
+            );
+            this.jedis.hmset(String.format("test:heterogeneous:%s", i), testMap);
+        }
+        
+        // Inject some lists.
+        List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
+        for (int i = 6; i < 9; ++i) {
+            for (String testValue : testList) {
+                this.jedis.rpush(String.format("test:heterogeneous:%s", i), String.format(testValue, i));
+            }
+        }
+        
+        // Inject some sets.
+        Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
+        for (int i = 9; i < 12; ++i) {
+            for (String testValue : testSet) {
+                this.jedis.sadd(String.format("test:heterogeneous:%s", i), String.format(testValue, i));
+            }
+        }
+        
+        MultiHeterogeneousWithoutKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithoutKeysInjectClass.class);
+        List<Object> actualObjects = dummy.getInjectedObjects();
+        assertThat(actualObjects.size(), is(12));
+        
+        // Test strings.
+        for (int i = 0; i < 3; ++i) {
+            assertThat(actualObjects.contains(String.format("test_value:%s", i)), is(true));
+        }
+        
+        // Test maps.
+        for (int i = 3; i < 6; ++i) {
+            Map<String, String> expectedMap = ImmutableMap.of(
+                String.format("key_%s1", i), String.format("value_%s1", i),
+                String.format("key_%s2", i), String.format("value_%s2", i),
+                String.format("key_%s3", i), String.format("value_%s3", i)
+            );
+            assertThat(actualObjects.contains(expectedMap), is(true));
+        }
+        
+        // Test lists.
+        for (int i = 6; i < 9; ++i) {
+            List<String> expectedList = Lists.newArrayList(
+                String.format("value_%s1", i),
+                String.format("value_%s2", i),
+                String.format("value_%s3", i));
+            assertThat(actualObjects.contains(expectedList), is(true));
+        }
+        
+        // Test sets.
+        for (int i = 9; i < 12; ++i) {
+            Set<String> expectedSet = Sets.newHashSet(
+                String.format("value_%s1", i),
+                String.format("value_%s2", i),
+                String.format("value_%s3", i));
+            assertThat(actualObjects.contains(expectedSet), is(true));
+        }
+        
+        for (int i = 0; i < 12; ++i) {
+            this.jedis.del(String.format("test:heterogeneous:%s", i));
+        }
+    }
+    
+    @Test
+    public void test_that_multiple_objects_with_keys_are_injected_into_map_of_objects_field() {
+        // Inject some strings.
+        for (int i = 0; i < 3; ++i) {
+            this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
+        }
+        
+        // Inject some maps.
+        for (int i = 3; i < 6; ++i) {
+            Map<String, String> testMap = ImmutableMap.of(
+                String.format("key_%s1", i), String.format("value_%s1", i),
+                String.format("key_%s2", i), String.format("value_%s2", i),
+                String.format("key_%s3", i), String.format("value_%s3", i)
+            );
+            this.jedis.hmset(String.format("test:heterogeneous:%s", i), testMap);
+        }
+        
+        // Inject some lists.
+        List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
+        for (int i = 6; i < 9; ++i) {
+            for (String testValue : testList) {
+                this.jedis.rpush(String.format("test:heterogeneous:%s", i), String.format(testValue, i));
+            }
+        }
+        
+        // Inject some sets.
+        Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
+        for (int i = 9; i < 12; ++i) {
+            for (String testValue : testSet) {
+                this.jedis.sadd(String.format("test:heterogeneous:%s", i), String.format(testValue, i));
+            }
+        }
+        
+        MultiHeterogeneousWithKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithKeysInjectClass.class);
+        Map<String, Object> actualObjects = dummy.getInjectedObjects();
+        assertThat(actualObjects.size(), is(12));
+        
+        // Test strings.
+        for (int i = 0; i < 3; ++i) {
+            String actualString = (String)actualObjects.get(String.format("test:heterogeneous:%s", i));
+            assertThat(actualString, is(equalTo(String.format("test_value:%s", i))));
+        }
+        
+        // Test maps.
+        for (int i = 3; i < 6; ++i) {
+            Map<String, String> actualMap = (Map)actualObjects.get(String.format("test:heterogeneous:%s", i));
+            Map<String, String> expectedMap = ImmutableMap.of(
+                String.format("key_%s1", i), String.format("value_%s1", i),
+                String.format("key_%s2", i), String.format("value_%s2", i),
+                String.format("key_%s3", i), String.format("value_%s3", i)
+            );
+            assertThat(actualMap, is(equalTo(expectedMap)));
+        }
+        
+        // Test lists.
+        for (int i = 6; i < 9; ++i) {
+            List<String> actualList = (List)actualObjects.get(String.format("test:heterogeneous:%s", i));
+            List<String> expectedList = Lists.newArrayList(
+                String.format("value_%s1", i),
+                String.format("value_%s2", i),
+                String.format("value_%s3", i));
+            assertThat(actualList, is(equalTo(expectedList)));
+        }
+        
+        // Test sets.
+        for (int i = 9; i < 12; ++i) {
+            Set<String> actualSet = (Set)actualObjects.get(String.format("test:heterogeneous:%s", i));
+            Set<String> expectedSet = Sets.newHashSet(
+                String.format("value_%s1", i),
+                String.format("value_%s2", i),
+                String.format("value_%s3", i));
+            assertThat(actualSet, is(equalTo(expectedSet)));
+        }
+        
+        for (int i = 0; i < 12; ++i) {
+            this.jedis.del(String.format("test:heterogeneous:%s", i));
         }
     }
 }
