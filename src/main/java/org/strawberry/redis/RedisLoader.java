@@ -24,11 +24,10 @@ import static org.strawberry.util.JedisUtil.using;
  * @author Wiehann Matthysen
  */
 public final class RedisLoader extends CacheLoader<Field, Option> {
-
-    private static final String STRING = "string";
-    private static final String HASH = "hash";
-    private static final String LIST = "list";
-    private static final String SET = "set";
+    
+    private enum JedisType {
+        STRING, HASH, LIST, SET, ZSET
+    }
     
     private final JedisPool pool;
 
@@ -67,54 +66,82 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
     
     private static Object listValueOf(Jedis jedis, String key, boolean alwaysNest) {
         Object value = null;
-        String jedisType = jedis.type(key);
-        if (jedisType.equals(STRING)) {
-            value = Lists.newArrayList(jedis.get(key));
-        } else if (jedisType.equals(HASH)) {
-            value = Lists.newArrayList(jedis.hgetAll(key));
-        } else if (jedisType.equals(LIST)) {
-            if (alwaysNest) {
-                List<List<String>> nestedList = Lists.newArrayList();
-                nestedList.add(jedis.lrange(key, 0, -1));
-                value = nestedList;
-            } else {
-                value = jedis.lrange(key, 0, -1);
-            }
-        } else if (jedisType.equals(SET)) {
-            if (alwaysNest) {
-                List<Set<String>> nestedList = Lists.newArrayList();
-                nestedList.add(jedis.smembers(key));
-                value = nestedList;
-            } else {
-                value = Lists.newArrayList(jedis.smembers(key));
-            }
+        JedisType jedisType = JedisType.valueOf(jedis.type(key).toUpperCase());
+        switch (jedisType) {
+            case STRING: {
+                value = Lists.newArrayList(jedis.get(key));
+            } break;
+            case HASH: {
+                value = Lists.newArrayList(jedis.hgetAll(key));
+            } break;
+            case LIST: {
+                if (alwaysNest) {
+                    List<List<String>> nestedList = Lists.newArrayList();
+                    nestedList.add(jedis.lrange(key, 0, -1));
+                    value = nestedList;
+                } else {
+                    value = jedis.lrange(key, 0, -1);
+                }
+            } break;
+            case SET: {
+                if (alwaysNest) {
+                    List<Set<String>> nestedList = Lists.newArrayList();
+                    nestedList.add(jedis.smembers(key));
+                    value = nestedList;
+                } else {
+                    value = Lists.newArrayList(jedis.smembers(key));
+                }
+            } break;
+            case ZSET: {
+                if (alwaysNest) {
+                    List<Set<String>> nestedList = Lists.newArrayList();
+                    nestedList.add(jedis.zrange(key, 0, -1));
+                    value = nestedList;
+                } else {
+                    value = Lists.newArrayList(jedis.zrange(key, 0, -1));
+                }
+            } break;
         }
         return value;
     }
     
     private static Object setValueOf(Jedis jedis, String key, boolean alwaysNest) {
         Object value = null;
-        String jedisType = jedis.type(key);
-        if (jedisType.equals(STRING)) {
-            value = Sets.newHashSet(jedis.get(key));
-        } else if (jedisType.equals(HASH)) {
-            value = Sets.newHashSet(jedis.hgetAll(key));
-        } else if (jedisType.equals(LIST)) {
-            if (alwaysNest) {
-                Set<List<String>> nestedSet = Sets.newHashSet();
-                nestedSet.add(jedis.lrange(key, 0, -1));
-                value = nestedSet;
-            } else {
-                value = Sets.newHashSet(jedis.lrange(key, 0, -1));
-            }
-        } else if (jedisType.equals(SET)) {
-            if (alwaysNest) {
-                Set<Set<String>> nestedSet = Sets.newHashSet();
-                nestedSet.add(jedis.smembers(key));
-                value = nestedSet;
-            } else {
-                value = jedis.smembers(key);
-            }
+        JedisType jedisType = JedisType.valueOf(jedis.type(key).toUpperCase());
+        switch (jedisType) {
+            case STRING: {
+                value = Sets.newHashSet(jedis.get(key));
+            } break;
+            case HASH: {
+                value = Sets.newHashSet(jedis.hgetAll(key));
+            } break;
+            case LIST: {
+                if (alwaysNest) {
+                    Set<List<String>> nestedSet = Sets.newHashSet();
+                    nestedSet.add(jedis.lrange(key, 0, -1));
+                    value = nestedSet;
+                } else {
+                    value = Sets.newHashSet(jedis.lrange(key, 0, -1));
+                }
+            } break;
+            case SET: {
+                if (alwaysNest) {
+                    Set<Set<String>> nestedSet = Sets.newHashSet();
+                    nestedSet.add(jedis.smembers(key));
+                    value = nestedSet;
+                } else {
+                    value = jedis.smembers(key);
+                }
+            } break;
+            case ZSET: {
+                if (alwaysNest) {
+                    Set<Set<String>> nestedSet = Sets.newHashSet();
+                    nestedSet.add(jedis.zrange(key, 0, -1));
+                    value = nestedSet;
+                } else {
+                    value = jedis.zrange(key, 0, -1);
+                }
+            } break;
         }
         return value;
     }
@@ -136,14 +163,23 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                     if (fieldType.equals(Map.class)) {
                         Map<String, Object> map = Maps.newLinkedHashMap();
                         for (String redisKey : redisKeys) {
-                            if (jedis.type(redisKey).equals(STRING)) {
-                                map.put(redisKey, jedis.get(redisKey));
-                            } else if (jedis.type(redisKey).equals(HASH)) {
-                                map.put(redisKey, jedis.hgetAll(redisKey));
-                            } else if (jedis.type(redisKey).equals(LIST)) {
-                                map.put(redisKey, jedis.lrange(redisKey, 0, -1));
-                            } else if (jedis.type(redisKey).equals(SET)) {
-                                map.put(redisKey, jedis.smembers(redisKey));
+                            JedisType jedisType = JedisType.valueOf(jedis.type(redisKey).toUpperCase());
+                            switch (jedisType) {
+                                case STRING: {
+                                    map.put(redisKey, jedis.get(redisKey));
+                                } break;
+                                case HASH: {
+                                    map.put(redisKey, jedis.hgetAll(redisKey));
+                                } break;
+                                case LIST: {
+                                    map.put(redisKey, jedis.lrange(redisKey, 0, -1));
+                                } break;
+                                case SET: {
+                                    map.put(redisKey, jedis.smembers(redisKey));
+                                } break;
+                                case ZSET : {
+                                    map.put(redisKey, jedis.zrange(redisKey, 0, -1));
+                                } break;
                             }
                         }
                         value = map;
@@ -192,14 +228,23 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         if (fieldType.equals(List.class)) {
                             List<Object> list = Lists.newArrayList();
                             for (String redisKey : redisKeys) {
-                                if (jedis.type(redisKey).equals(STRING)) {
-                                    list.add(jedis.get(redisKey));
-                                } else if (jedis.type(redisKey).equals(HASH)) {
-                                    list.add(jedis.hgetAll(redisKey));
-                                } else if (jedis.type(redisKey).equals(LIST)) {
-                                    list.add(jedis.lrange(redisKey, 0, -1));
-                                } else if (jedis.type(redisKey).equals(SET)) {
-                                    list.add(jedis.smembers(redisKey));
+                                JedisType jedisType = JedisType.valueOf(jedis.type(redisKey).toUpperCase());
+                                switch (jedisType) {
+                                    case STRING: {
+                                        list.add(jedis.get(redisKey));
+                                    } break;
+                                    case HASH: {
+                                        list.add(jedis.hgetAll(redisKey));
+                                    } break;
+                                    case LIST: {
+                                        list.add(jedis.lrange(redisKey, 0, -1));
+                                    } break;
+                                    case SET: {
+                                        list.add(jedis.smembers(redisKey));
+                                    } break;
+                                    case ZSET: {
+                                        list.add(jedis.zrange(redisKey, 0, -1));
+                                    } break;
                                 }
                             }
                             value = list;

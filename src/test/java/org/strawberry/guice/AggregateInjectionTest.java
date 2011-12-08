@@ -119,6 +119,27 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
+    public static class MultiOrderedSetsWithoutKeysInjectClass {
+        
+        @Redis("test:zset:*")
+        private List<Set<String>> injectedSets;
+        
+        public List<Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
+    
+    public static class MultiOrderedSetsWithKeysInjectClass {
+        
+        @Redis(value = "test:zset:*", includeKeys = true)
+        private Map<String, Set<String>> injectedSets;
+        
+        public Map<String, Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
+    
+    
     public static class MultiHeterogeneousWithoutKeysInjectClass {
         
         @Redis(value = "test:heterogeneous:*")
@@ -328,15 +349,69 @@ public class AggregateInjectionTest extends AbstractModule {
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
-            Set<String> expecteSet = Sets.newHashSet(
+            Set<String> expectedSet = Sets.newHashSet(
                 String.format("value_%s1", i),
                 String.format("value_%s2", i),
                 String.format("value_%s3", i)
             );
-            assertThat(actualSets.get(String.format("test:set:%s", i)), is(equalTo(expecteSet)));
+            assertThat(actualSets.get(String.format("test:set:%s", i)), is(equalTo(expectedSet)));
         }
         for (int i = 0; i < 10; ++i) {
             this.jedis.del(String.format("test:set:%s", i));
+        }
+    }
+    
+    
+    
+    @Test
+    public void test_that_multiple_ordered_sets_without_keys_are_injected_into_list_of_set_field() {
+        List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
+        for (int i = 0; i < 10; ++i) {
+            for (String testValue : testList) {
+                this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
+            }
+        }
+        MultiOrderedSetsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiOrderedSetsWithoutKeysInjectClass.class);
+        List<Set<String>> actualSets = dummy.getInjectedSets();
+        assertThat(actualSets.size(), is(10));
+        for (int i = 0; i < 10; ++i) {
+            Set<String> expectedSet = Sets.newLinkedHashSet(
+                Lists.newArrayList(
+                    String.format("value_%s3", i),
+                    String.format("value_%s2", i),
+                    String.format("value_%s1", i)
+                )
+            );
+            assertThat(actualSets.contains(expectedSet), is(true));
+        }
+        for (int i = 0; i < 10; ++i) {
+            this.jedis.del(String.format("test:zset:%s", i));
+        }
+    }
+    
+    @Test
+    public void test_that_multiple_ordered_sets_with_keys_are_injected_into_map_of_set_field() {
+        List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
+        for (int i = 0; i < 10; ++i) {
+            for (String testValue : testList) {
+                this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
+            }
+        }
+        MultiOrderedSetsWithKeysInjectClass dummy = this.injector.getInstance(MultiOrderedSetsWithKeysInjectClass.class);
+        Map<String, Set<String>> actualSets = dummy.getInjectedSets();
+        assertThat(actualSets.size(), is(10));
+        for (int i = 0; i < 10; ++i) {
+            Set<String> expectedSet = Sets.newLinkedHashSet(
+                Lists.newArrayList(
+                    String.format("value_%s3", i),
+                    String.format("value_%s2", i),
+                    String.format("value_%s1", i)
+                )
+            );
+            assertThat(actualSets.get(String.format("test:zset:%s", i)), is(equalTo(expectedSet)));
+        }
+        for (int i = 0; i < 10; ++i) {
+            this.jedis.del(String.format("test:zset:%s", i));
         }
     }
     
@@ -375,9 +450,17 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
+        // Inject some ordered sets.
+        List<String> testOrderedSet = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
+        for (int i = 12; i < 15; ++i) {
+            for (String testValue : testOrderedSet) {
+                this.jedis.zadd(String.format("test:heterogeneous:%s", i), i, String.format(testValue, i));
+            }
+        }
+        
         MultiHeterogeneousWithoutKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithoutKeysInjectClass.class);
         List<Object> actualObjects = dummy.getInjectedObjects();
-        assertThat(actualObjects.size(), is(12));
+        assertThat(actualObjects.size(), is(15));
         
         // Test strings.
         for (int i = 0; i < 3; ++i) {
@@ -412,7 +495,19 @@ public class AggregateInjectionTest extends AbstractModule {
             assertThat(actualObjects.contains(expectedSet), is(true));
         }
         
-        for (int i = 0; i < 12; ++i) {
+        // Test ordered sets.
+        for (int i = 12; i < 15; ++i) {
+            Set<String> expectedSet = Sets.newLinkedHashSet(
+                Lists.newArrayList(
+                    String.format("value_%s3", i),
+                    String.format("value_%s2", i),
+                    String.format("value_%s1", i)
+                )
+            );
+            assertThat(actualObjects.contains(expectedSet), is(true));
+        }
+        
+        for (int i = 0; i < 15; ++i) {
             this.jedis.del(String.format("test:heterogeneous:%s", i));
         }
     }
@@ -450,9 +545,17 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
+        // Inject some ordered sets.
+        List<String> testOrderedSet = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
+        for (int i = 12; i < 15; ++i) {
+            for (String testValue : testOrderedSet) {
+                this.jedis.zadd(String.format("test:heterogeneous:%s", i), i, String.format(testValue, i));
+            }
+        }
+        
         MultiHeterogeneousWithKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithKeysInjectClass.class);
         Map<String, Object> actualObjects = dummy.getInjectedObjects();
-        assertThat(actualObjects.size(), is(12));
+        assertThat(actualObjects.size(), is(15));
         
         // Test strings.
         for (int i = 0; i < 3; ++i) {
@@ -491,7 +594,20 @@ public class AggregateInjectionTest extends AbstractModule {
             assertThat(actualSet, is(equalTo(expectedSet)));
         }
         
-        for (int i = 0; i < 12; ++i) {
+        // Test ordered sets.
+        for (int i = 12; i < 15; ++i) {
+            Set<String> actualSet = (Set)actualObjects.get(String.format("test:heterogeneous:%s", i));
+            Set<String> expectedSet = Sets.newLinkedHashSet(
+                Lists.newArrayList(
+                    String.format("value_%s3", i),
+                    String.format("value_%s2", i),
+                    String.format("value_%s1", i)
+                )
+            );
+            assertThat(actualSet, is(equalTo(expectedSet)));
+        }
+        
+        for (int i = 0; i < 15; ++i) {
             this.jedis.del(String.format("test:heterogeneous:%s", i));
         }
     }

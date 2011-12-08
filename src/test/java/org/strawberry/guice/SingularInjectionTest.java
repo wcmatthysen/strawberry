@@ -105,13 +105,13 @@ public class SingularInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleSetAsListWithoutKeyClass {
+    public static class SingleListAsSetWithoutKeyClass {
         
-        @Redis("test:set")
-        private List<String> injectedList;
+        @Redis("test:list")
+        private Set<String> injectedSet;
         
-        public List<String> getInjectedList() {
-            return this.injectedList;
+        public Set<String> getInjectedSet() {
+            return this.injectedSet;
         }
     }
     
@@ -177,13 +177,13 @@ public class SingularInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleListAsSetWithoutKeyClass {
+    public static class SingleSetAsListWithoutKeyClass {
         
-        @Redis("test:list")
-        private Set<String> injectedSet;
+        @Redis("test:set")
+        private List<String> injectedList;
         
-        public Set<String> getInjectedSet() {
-            return this.injectedSet;
+        public List<String> getInjectedList() {
+            return this.injectedList;
         }
     }
 
@@ -236,6 +236,59 @@ public class SingularInjectionTest extends AbstractModule {
             return this.injectedSet;
         }
     }
+    
+    
+    
+    public static class SingleOrderedSetWithoutKeyClass {
+        
+        @Redis("test:zset")
+        private Set<String> injectedOrderedSet;
+
+        public Set<String> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
+        }
+    }
+    
+    public static class SingleOrderedSetAsListWithoutKeyClass {
+        
+        @Redis("test:zset")
+        private List<String> injectedList;
+        
+        public List<String> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+    
+    public static class SingleOrderedSetWithKeyClass {
+
+        @Redis(value = "test:zset", includeKeys = true)
+        private Map<String, Set<String>> injectedSet;
+
+        public Map<String, Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
+    public static class SingleOrderedSetInListWithoutKeyClass {
+        
+        @Redis(value = "test:zset", alwaysNest = true)
+        private List<Set<String>> injectedSet;
+        
+        public List<Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
+    public static class SingleOrderedSetInSetWithoutKeyClass {
+
+        @Redis(value = "test:zset", alwaysNest = true)
+        private Set<Set<String>> injectedSet;
+
+        public Set<Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
 
     @Override
     protected void configure() {
@@ -337,15 +390,15 @@ public class SingularInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_single_set_without_key_is_injected_into_list_field() {
-        Set<String> expectedSet = Sets.newHashSet("value_01", "value_02", "value_03");
-        for (String value : expectedSet) {
-            this.jedis.sadd("test:set", value);
+    public void test_that_single_list_without_key_is_injected_into_set_field() {
+        List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
+        for (String value : expectedList) {
+            this.jedis.rpush("test:list", value);
         }
-        SingleSetAsListWithoutKeyClass dummy = this.injector.getInstance(SingleSetAsListWithoutKeyClass.class);
-        Set<String> actualSet = Sets.newHashSet(dummy.getInjectedList());
-        assertThat(actualSet, is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
+        SingleListAsSetWithoutKeyClass dummy = this.injector.getInstance(SingleListAsSetWithoutKeyClass.class);
+        Set<String> actualSet = dummy.getInjectedSet();
+        assertThat(actualSet, is(equalTo((Set)Sets.newHashSet(expectedList))));
+        this.jedis.del("test:list");
     }
     
     @Test
@@ -414,15 +467,15 @@ public class SingularInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_single_list_without_key_is_injected_into_set_field() {
-        List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        for (String value : expectedList) {
-            this.jedis.rpush("test:list", value);
+    public void test_that_single_set_without_key_is_injected_into_list_field() {
+        Set<String> expectedSet = Sets.newHashSet("value_01", "value_02", "value_03");
+        for (String value : expectedSet) {
+            this.jedis.sadd("test:set", value);
         }
-        SingleListAsSetWithoutKeyClass dummy = this.injector.getInstance(SingleListAsSetWithoutKeyClass.class);
-        Set<String> actualSet = dummy.getInjectedSet();
-        assertThat(actualSet, is(equalTo((Set)Sets.newHashSet(expectedList))));
-        this.jedis.del("test:list");
+        SingleSetAsListWithoutKeyClass dummy = this.injector.getInstance(SingleSetAsListWithoutKeyClass.class);
+        Set<String> actualSet = Sets.newHashSet(dummy.getInjectedList());
+        assertThat(actualSet, is(equalTo(expectedSet)));
+        this.jedis.del("test:set");
     }
     
     @Test
@@ -475,5 +528,73 @@ public class SingularInjectionTest extends AbstractModule {
     public void test_that_single_set_without_key_thats_missing_is_injected_as_empty_set_into_set_field() {
         SingleSetWithoutKeyMissingClass dummy = this.injector.getInstance(SingleSetWithoutKeyMissingClass.class);
         assertThat(dummy.getInjectedSet(), is(equalTo(Collections.EMPTY_SET)));
+    }
+    
+    
+    
+    @Test
+    public void test_that_single_ordered_set_without_key_is_injected_into_set_field() {
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        SingleOrderedSetWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetWithoutKeyClass.class);
+        List<String> actualList = Lists.newArrayList(dummy.getInjectedOrderedSet());
+        assertThat(actualList, is(equalTo(expectedList)));
+        this.jedis.del("test:zset");
+    }
+    
+    @Test
+    public void test_that_single_ordered_set_without_key_is_injected_into_list_field() {
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        SingleOrderedSetAsListWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetAsListWithoutKeyClass.class);
+        List<String> actualList = dummy.getInjectedList();
+        assertThat(actualList, is(equalTo(expectedList)));
+        this.jedis.del("test:zset");
+    }
+    
+    @Test
+    public void test_that_single_ordered_set_with_key_is_injected_into_map_field() {
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        SingleOrderedSetWithKeyClass dummy = this.injector.getInstance(SingleOrderedSetWithKeyClass.class);
+        Map<String, Set<String>> actualMapSet = dummy.getInjectedSet();
+        assertThat(actualMapSet.size(), is(1));
+        List<String> actualList = Lists.newArrayList(actualMapSet.get("test:zset"));
+        assertThat(actualList, is(equalTo(expectedList)));
+        this.jedis.del("test:zset");
+    }
+    
+    @Test
+    public void test_that_single_ordered_set_without_key_is_injected_into_list_of_set_field() {
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        SingleOrderedSetInListWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetInListWithoutKeyClass.class);
+        List<Set<String>> actualListSet = dummy.getInjectedSet();
+        assertThat(actualListSet.size(), is(1));
+        List<String> actualList = Lists.newArrayList(actualListSet.get(0));
+        assertThat(actualList, is(equalTo(expectedList)));
+        this.jedis.del("test:zset");
+    }
+    
+    @Test
+    public void test_that_single_ordered_set_without_key_is_injected_into_set_of_set_field() {
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        SingleOrderedSetInSetWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetInSetWithoutKeyClass.class);
+        Set<Set<String>> actualSetSet = dummy.getInjectedSet();
+        assertThat(actualSetSet.size(), is(1));
+        List<String> actualList = Lists.newArrayList(Iterables.getOnlyElement(actualSetSet));
+        assertThat(actualList, is(equalTo(expectedList)));
+        this.jedis.del("test:zset");
     }
 }
