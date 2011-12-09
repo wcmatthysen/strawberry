@@ -175,7 +175,11 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                 } else {
                     if (redisKeys.size() == 1) {
                         String redisKey = Iterables.getOnlyElement(redisKeys);
-                        if (fieldType.equals(String.class)) {
+                        if (fieldType.equals(char[].class)) {
+                            value = jedis.get(redisKey).toCharArray();
+                        } else if (fieldType.equals(Character[].class)) {
+                            value = ArrayUtils.toObject(jedis.get(redisKey).toCharArray());
+                        } else if (fieldType.equals(String.class)) {
                             value = jedis.get(redisKey);
                         } else if (fieldType.equals(byte[].class)) {
                             value = jedis.get(redisKey.getBytes());
@@ -207,10 +211,8 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                             }
                         } else if (fieldType.equals(Map.class)) {
                             value = jedis.hgetAll(redisKey);
-                        } else if (fieldType.equals(List.class)) {
-                            value = collectionOf(List.class, jedis, redisKey, alwaysNest);
-                        } else if (fieldType.equals(Set.class)) {
-                            value = collectionOf(Set.class, jedis, redisKey, alwaysNest);
+                        } else if (fieldType.equals(List.class) || fieldType.equals(Set.class)) {
+                            value = collectionOf(fieldType, jedis, redisKey, alwaysNest);
                         }
                     } else if (redisKeys.size() > 1) {
                         if (fieldType.equals(List.class)) {

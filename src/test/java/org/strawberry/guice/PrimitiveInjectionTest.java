@@ -29,6 +29,26 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     private Injector injector;
     private Jedis jedis;
+    
+    public static class SinglePrimitiveCharArrayWithoutKeyClass {
+        
+        @Redis("test:chars")
+        private char[] injectedChars;
+        
+        public char[] getInjectedChars() {
+            return this.injectedChars;
+        }
+    }
+    
+    public static class SingleCharArrayWithoutKeyClass {
+        
+        @Redis("test:chars")
+        private Character[] injectedChars;
+        
+        public Character[] getInjectedChars() {
+            return this.injectedChars;
+        }
+    }
 
     public static class SingleStringWithoutKeyClass {
 
@@ -39,7 +59,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
-
+    
+    
+    
     public static class SinglePrimitiveByteArrayWithoutKeyClass {
 
         @Redis("test:bytes")
@@ -59,7 +81,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedBytes;
         }
     }
-
+    
+    
+    
     public static class SinglePrimitiveBooleanWithoutKeyClass {
 
         @Redis("test:boolean")
@@ -79,7 +103,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedBoolean;
         }
     }
-
+    
+    
+    
     public static class SinglePrimitiveIntegerWithoutKeyClass {
 
         @Redis("test:integer")
@@ -99,7 +125,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedInteger;
         }
     }
-
+    
+    
+    
     public static class SinglePrimitiveDoubleWithoutKeyClass {
 
         @Redis("test:double")
@@ -119,7 +147,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedDouble;
         }
     }
-
+    
+    
+    
     public static class SingleStringWithKeyClass {
 
         @Redis(value = "test:string", includeKeys = true)
@@ -149,6 +179,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
+    
+    
 
     public static class SingleStringWithoutKeyMissingAllowNullClass {
 
@@ -187,6 +219,22 @@ public class PrimitiveInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_single_string_without_key_is_injected_into_primitive_char_array_field() {
+        this.jedis.set("test:chars", "test_value");
+        SinglePrimitiveCharArrayWithoutKeyClass dummy = this.injector.getInstance(SinglePrimitiveCharArrayWithoutKeyClass.class);
+        assertThat(dummy.getInjectedChars(), is(equalTo("test_value".toCharArray())));
+        this.jedis.del("test:chars");
+    }
+    
+    @Test
+    public void test_that_single_string_without_key_is_injected_into_char_array_field() {
+        this.jedis.set("test:chars", "test_value");
+        SingleCharArrayWithoutKeyClass dummy = this.injector.getInstance(SingleCharArrayWithoutKeyClass.class);
+        assertThat(ArrayUtils.toPrimitive(dummy.getInjectedChars()), is(equalTo("test_value".toCharArray())));
+        this.jedis.del("test:chars");
+    }
+    
+    @Test
     public void test_that_single_string_without_key_is_injected_into_string_field() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
@@ -194,6 +242,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
         assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
         this.jedis.del("test:string");
     }
+    
+    
     
     @Test
     public void test_that_single_string_without_key_is_injected_into_primitive_byte_array_field() {
@@ -210,6 +260,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedBytes()), is(equalTo("test_value".getBytes())));
         this.jedis.del("test:bytes");
     }
+    
+    
     
     @Test
     public void test_that_single_string_without_key_is_converted_into_primitive_boolean_field() {
@@ -233,6 +285,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.del("test:boolean");
     }
     
+    
+    
     @Test
     public void test_that_single_string_without_key_is_converted_into_primitive_integer_field() {
         this.jedis.set("test:integer", "123");
@@ -255,6 +309,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.del("test:integer");
     }
     
+    
+    
     @Test
     public void test_that_single_string_without_key_is_converted_into_primitive_double_field() {
         this.jedis.set("test:double", "123.456");
@@ -265,6 +321,19 @@ public class PrimitiveInjectionTest extends AbstractModule {
         assertThat(dummy.getInjectedDouble(), is(0.123));
         this.jedis.del("test:double");
     }
+    
+    @Test
+    public void test_that_single_string_without_key_is_converted_into_double_field() {
+        this.jedis.set("test:double", "123.456");
+        SingleDoubleWithoutKeyClass dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+        assertThat(dummy.getInjectedDouble(), is(123.456));
+        this.jedis.set("test:double", ".123");
+        dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+        assertThat(dummy.getInjectedDouble(), is(0.123));
+        this.jedis.del("test:double");
+    }
+    
+    
     
     @Test
     public void test_that_single_string_with_key_is_injected_into_map_field() {
@@ -298,6 +367,8 @@ public class PrimitiveInjectionTest extends AbstractModule {
         assertThat(Iterables.getOnlyElement(actualStringSet), is(equalTo(expectedString)));
         this.jedis.del("test:string");
     }
+    
+    
     
     @Test
     public void test_that_single_string_without_key_thats_missing_is_injected_as_null_into_string_field() {
