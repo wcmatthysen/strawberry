@@ -215,6 +215,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
 
     @After
     public void teardown() {
+        for (String key : this.jedis.keys("test:*")) {
+            this.jedis.del(key);
+        }
         this.pool.returnResource(this.jedis);
     }
     
@@ -223,7 +226,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:chars", "test_value");
         SinglePrimitiveCharArrayWithoutKeyClass dummy = this.injector.getInstance(SinglePrimitiveCharArrayWithoutKeyClass.class);
         assertThat(dummy.getInjectedChars(), is(equalTo("test_value".toCharArray())));
-        this.jedis.del("test:chars");
     }
     
     @Test
@@ -231,7 +233,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:chars", "test_value");
         SingleCharArrayWithoutKeyClass dummy = this.injector.getInstance(SingleCharArrayWithoutKeyClass.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedChars()), is(equalTo("test_value".toCharArray())));
-        this.jedis.del("test:chars");
     }
     
     @Test
@@ -240,7 +241,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:string", expectedString);
         SingleStringWithoutKeyClass dummy = this.injector.getInstance(SingleStringWithoutKeyClass.class);
         assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
-        this.jedis.del("test:string");
     }
     
     
@@ -250,7 +250,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:bytes", "test_value");
         SinglePrimitiveByteArrayWithoutKeyClass dummy = this.injector.getInstance(SinglePrimitiveByteArrayWithoutKeyClass.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo("test_value".getBytes())));
-        this.jedis.del("test:bytes");
     }
     
     @Test
@@ -258,7 +257,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:bytes", "test_value");
         SingleByteArrayWithoutKeyClass dummy = this.injector.getInstance(SingleByteArrayWithoutKeyClass.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedBytes()), is(equalTo("test_value".getBytes())));
-        this.jedis.del("test:bytes");
     }
     
     
@@ -271,7 +269,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:boolean", "F");
         dummy = this.injector.getInstance(SinglePrimitiveBooleanWithoutKeyClass.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
-        this.jedis.del("test:boolean");
     }
     
     @Test
@@ -282,7 +279,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:boolean", "No");
         dummy = this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
-        this.jedis.del("test:boolean");
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_boolean() {
+        this.jedis.set("test:boolean", "waar");
+        this.injector.getInstance(SinglePrimitiveBooleanWithoutKeyClass.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_boolean() {
+        this.jedis.set("test:boolean", "vals");
+        this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
     }
     
     
@@ -295,7 +303,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:integer", "-123");
         dummy = this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyClass.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
-        this.jedis.del("test:integer");
     }
     
     @Test
@@ -306,7 +313,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:integer", "-123");
         dummy = this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
-        this.jedis.del("test:integer");
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_integer() {
+        this.jedis.set("test:integer", "invalid");
+        this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyClass.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_integer() {
+        this.jedis.set("test:integer", "invalid");
+        this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
     }
     
     
@@ -319,7 +337,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:double", ".123");
         dummy = this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyClass.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
-        this.jedis.del("test:double");
     }
     
     @Test
@@ -330,7 +347,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:double", ".123");
         dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
-        this.jedis.del("test:double");
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_double() {
+        this.jedis.set("test:double", "invalid");
+        this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyClass.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_double() {
+        this.jedis.set("test:double", "invalid");
+        this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
     }
     
     
@@ -343,7 +371,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         Map<String, String> actualStringMap = dummy.getInjectedString();
         assertThat(actualStringMap.size(), is(1));
         assertThat(actualStringMap.get("test:string"), is(equalTo(expectedString)));
-        jedis.del("test:string");
     }
     
     @Test
@@ -354,7 +381,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         List<String> actualStringList = dummy.getInjectedString();
         assertThat(actualStringList.size(), is(1));
         assertThat(actualStringList.get(0), is(equalTo(expectedString)));
-        this.jedis.del("test:string");
     }
     
     @Test
@@ -365,7 +391,6 @@ public class PrimitiveInjectionTest extends AbstractModule {
         Set<String> actualStringSet = dummy.getInjectedString();
         assertThat(actualStringSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualStringSet), is(equalTo(expectedString)));
-        this.jedis.del("test:string");
     }
     
     

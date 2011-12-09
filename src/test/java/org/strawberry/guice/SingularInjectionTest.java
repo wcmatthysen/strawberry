@@ -303,6 +303,9 @@ public class SingularInjectionTest extends AbstractModule {
 
     @After
     public void teardown() {
+        for (String key : this.jedis.keys("test:*")) {
+            this.jedis.del(key);
+        }
         this.pool.returnResource(this.jedis);
     }
     
@@ -316,7 +319,6 @@ public class SingularInjectionTest extends AbstractModule {
         this.jedis.hmset("test:map", expectedMap);
         SingleMapWithoutKeyClass dummy = this.injector.getInstance(SingleMapWithoutKeyClass.class);
         assertThat(dummy.getInjectedMap(), is(equalTo(expectedMap)));
-        this.jedis.del("test:map");
     }
     
     @Test
@@ -345,7 +347,6 @@ public class SingularInjectionTest extends AbstractModule {
         List<Map<String, String>> actualMapList = dummy.getInjectedMap();
         assertThat(actualMapList.size(), is(1));
         assertThat(actualMapList.get(0), is(equalTo(expectedMap)));
-        this.jedis.del("test:map");
     }
     
     @Test
@@ -360,7 +361,6 @@ public class SingularInjectionTest extends AbstractModule {
         Set<Map<String, String>> actualMapSet = dummy.getInjectedMap();
         assertThat(actualMapSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualMapSet), is(equalTo(expectedMap)));
-        this.jedis.del("test:map");
     }
     
     @Test
@@ -386,7 +386,6 @@ public class SingularInjectionTest extends AbstractModule {
         }
         SingleListWithoutKeyClass dummy = this.injector.getInstance(SingleListWithoutKeyClass.class);
         assertThat(dummy.getInjectedList(), is(equalTo(expectedList)));
-        this.jedis.del("test:list");
     }
     
     @Test
@@ -398,7 +397,6 @@ public class SingularInjectionTest extends AbstractModule {
         SingleListAsSetWithoutKeyClass dummy = this.injector.getInstance(SingleListAsSetWithoutKeyClass.class);
         Set<String> actualSet = dummy.getInjectedSet();
         assertThat(actualSet, is(equalTo((Set)Sets.newHashSet(expectedList))));
-        this.jedis.del("test:list");
     }
     
     @Test
@@ -411,7 +409,6 @@ public class SingularInjectionTest extends AbstractModule {
         Map<String, List<String>> actualMapList = dummy.getInjectedList();
         assertThat(actualMapList.size(), is(1));
         assertThat(actualMapList.get("test:list"), is(equalTo(expectedList)));
-        this.jedis.del("test:list");
     }
     
     @Test
@@ -424,7 +421,6 @@ public class SingularInjectionTest extends AbstractModule {
         List<List<String>> actualListList = dummy.getInjectedList();
         assertThat(actualListList.size(), is(1));
         assertThat(actualListList.get(0), is(equalTo(expectedList)));
-        this.jedis.del("test:list");
     }
     
     @Test
@@ -437,7 +433,6 @@ public class SingularInjectionTest extends AbstractModule {
         Set<List<String>> actualSetList = dummy.getInjectedList();
         assertThat(actualSetList.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualSetList), is(equalTo(expectedList)));
-        this.jedis.del("test:list");
     }
     
     @Test
@@ -463,7 +458,6 @@ public class SingularInjectionTest extends AbstractModule {
         }
         SingleSetWithoutKeyClass dummy = this.injector.getInstance(SingleSetWithoutKeyClass.class);
         assertThat(dummy.getInjectedSet(), is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
     }
     
     @Test
@@ -475,7 +469,6 @@ public class SingularInjectionTest extends AbstractModule {
         SingleSetAsListWithoutKeyClass dummy = this.injector.getInstance(SingleSetAsListWithoutKeyClass.class);
         Set<String> actualSet = Sets.newHashSet(dummy.getInjectedList());
         assertThat(actualSet, is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
     }
     
     @Test
@@ -488,7 +481,6 @@ public class SingularInjectionTest extends AbstractModule {
         Map<String, Set<String>> actualMapSet = dummy.getInjectedSet();
         assertThat(actualMapSet.size(), is(1));
         assertThat(actualMapSet.get("test:set"), is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
     }
     
     @Test
@@ -501,7 +493,6 @@ public class SingularInjectionTest extends AbstractModule {
         List<Set<String>> actualListSet = dummy.getInjectedSet();
         assertThat(actualListSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualListSet), is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
     }
     
     @Test
@@ -514,7 +505,6 @@ public class SingularInjectionTest extends AbstractModule {
         Set<Set<String>> actualSetSet = dummy.getInjectedSet();
         assertThat(actualSetSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualSetSet), is(equalTo(expectedSet)));
-        this.jedis.del("test:set");
     }
     
     @Test
@@ -541,7 +531,6 @@ public class SingularInjectionTest extends AbstractModule {
         SingleOrderedSetWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetWithoutKeyClass.class);
         List<String> actualList = Lists.newArrayList(dummy.getInjectedOrderedSet());
         assertThat(actualList, is(equalTo(expectedList)));
-        this.jedis.del("test:zset");
     }
     
     @Test
@@ -553,7 +542,6 @@ public class SingularInjectionTest extends AbstractModule {
         SingleOrderedSetAsListWithoutKeyClass dummy = this.injector.getInstance(SingleOrderedSetAsListWithoutKeyClass.class);
         List<String> actualList = dummy.getInjectedList();
         assertThat(actualList, is(equalTo(expectedList)));
-        this.jedis.del("test:zset");
     }
     
     @Test
@@ -567,7 +555,6 @@ public class SingularInjectionTest extends AbstractModule {
         assertThat(actualMapSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(actualMapSet.get("test:zset"));
         assertThat(actualList, is(equalTo(expectedList)));
-        this.jedis.del("test:zset");
     }
     
     @Test
@@ -581,7 +568,6 @@ public class SingularInjectionTest extends AbstractModule {
         assertThat(actualListSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(actualListSet.get(0));
         assertThat(actualList, is(equalTo(expectedList)));
-        this.jedis.del("test:zset");
     }
     
     @Test
@@ -595,6 +581,5 @@ public class SingularInjectionTest extends AbstractModule {
         assertThat(actualSetSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(Iterables.getOnlyElement(actualSetSet));
         assertThat(actualList, is(equalTo(expectedList)));
-        this.jedis.del("test:zset");
     }
 }

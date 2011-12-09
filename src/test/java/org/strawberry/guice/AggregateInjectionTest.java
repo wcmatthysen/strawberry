@@ -174,6 +174,9 @@ public class AggregateInjectionTest extends AbstractModule {
 
     @After
     public void teardown() {
+        for (String key : this.jedis.keys("test:*")) {
+            this.jedis.del(key);
+        }
         this.pool.returnResource(this.jedis);
     }
 
@@ -187,9 +190,6 @@ public class AggregateInjectionTest extends AbstractModule {
         }
         MultiStringsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiStringsWithoutKeysInjectClass.class);
         assertThat(Sets.newHashSet(dummy.getInjectedStrings()), is(equalTo(Sets.newHashSet(expectedList))));
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:string:%s", i));
-        }
     }
     
     @Test
@@ -202,9 +202,6 @@ public class AggregateInjectionTest extends AbstractModule {
         }
         MultiStringsWithKeysInjectClass dummy = this.injector.getInstance(MultiStringsWithKeysInjectClass.class);
         assertThat(dummy.getInjectedStrings(), is(equalTo(expectedMap)));
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:string:%s", i));
-        }
     }
     
     
@@ -230,9 +227,6 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             assertThat(actualMaps.contains(expectedMap), is(true));
         }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:map:%s", i));
-        }
     }
     
     @Test
@@ -255,9 +249,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 String.format("key_%s3", i), String.format("value_%s3", i)
             );
             assertThat(actualMaps.get(String.format("test:map:%s", i)), is(equalTo(expectedMap)));
-        }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:map:%s", i));
         }
     }
     
@@ -282,9 +273,6 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             assertThat(actualLists.contains(expectedList), is(true));
         }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:list:%s", i));
-        }
     }
     
     @Test
@@ -305,9 +293,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 String.format("value_%s3", i)
             );
             assertThat(actualLists.get(String.format("test:list:%s", i)), is(equalTo(expectedList)));
-        }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:list:%s", i));
         }
     }
     
@@ -332,9 +317,6 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             assertThat(actualSets.contains(expectedSet), is(true));
         }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:set:%s", i));
-        }
     }
     
     @Test
@@ -355,9 +337,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 String.format("value_%s3", i)
             );
             assertThat(actualSets.get(String.format("test:set:%s", i)), is(equalTo(expectedSet)));
-        }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:set:%s", i));
         }
     }
     
@@ -384,9 +363,6 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             assertThat(actualSets.contains(expectedSet), is(true));
         }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:zset:%s", i));
-        }
     }
     
     @Test
@@ -409,9 +385,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 )
             );
             assertThat(actualSets.get(String.format("test:zset:%s", i)), is(equalTo(expectedSet)));
-        }
-        for (int i = 0; i < 10; ++i) {
-            this.jedis.del(String.format("test:zset:%s", i));
         }
     }
     
@@ -505,10 +478,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 )
             );
             assertThat(actualObjects.contains(expectedSet), is(true));
-        }
-        
-        for (int i = 0; i < 15; ++i) {
-            this.jedis.del(String.format("test:heterogeneous:%s", i));
         }
     }
     
@@ -605,10 +574,6 @@ public class AggregateInjectionTest extends AbstractModule {
                 )
             );
             assertThat(actualSet, is(equalTo(expectedSet)));
-        }
-        
-        for (int i = 0; i < 15; ++i) {
-            this.jedis.del(String.format("test:heterogeneous:%s", i));
         }
     }
 }
