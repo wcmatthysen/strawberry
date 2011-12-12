@@ -43,7 +43,11 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
     
     private static Object nonNullValueOf(Class<?> type) {
         Object value = null;
-        if (type.equals(String.class)) {
+        if (type.equals(char[].class)) {
+            value = new char[]{};
+        } else if (type.equals(Character[].class)) {
+            value = new Character[]{};
+        } else if (type.equals(String.class)) {
             value = "";
         } else if (type.equals(byte[].class)) {
             value = new byte[]{};
