@@ -30,7 +30,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     private Injector injector;
     private Jedis jedis;
     
-    public static class SinglePrimitiveCharArrayWithoutKeyClass {
+    public static class PrimitiveCharArrayWithoutKey {
         
         @Redis("test:chars")
         private char[] injectedChars;
@@ -40,7 +40,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SinglePrimitiveCharArrayWithoutKeyAllowNullClass {
+    public static class PrimitiveCharArrayWithoutKeyAllowNull {
         
         @Redis(value = "test:chars", allowNull = true)
         private char[] injectedChars;
@@ -50,7 +50,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleCharArrayWithoutKeyClass {
+    public static class CharArrayWithoutKey {
         
         @Redis("test:chars")
         private Character[] injectedChars;
@@ -60,7 +60,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleCharArrayWithoutKeyAllowNullClass {
+    public static class CharArrayWithoutKeyAllowNull {
         
         @Redis(value = "test:chars", allowNull = true)
         private Character[] injectedChars;
@@ -72,7 +72,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SingleStringWithoutKeyClass {
+    public static class StringWithoutKey {
 
         @Redis("test:string")
         private String injectedString;
@@ -82,7 +82,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-        public static class SingleStringWithoutKeyAllowNullClass {
+        public static class StringWithoutKeyAllowNull {
 
         @Redis(value = "test:string", allowNull = true)
         private String injectedString;
@@ -94,7 +94,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SinglePrimitiveByteArrayWithoutKeyClass {
+    public static class PrimitiveByteArrayWithoutKey {
 
         @Redis("test:bytes")
         private byte[] injectedBytes;
@@ -104,7 +104,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SinglePrimitiveByteArrayWithoutKeyAllowNullClass {
+    public static class PrimitiveByteArrayWithoutKeyAllowNull {
 
         @Redis(value = "test:bytes", allowNull = true)
         private byte[] injectedBytes;
@@ -114,7 +114,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
 
-    public static class SingleByteArrayWithoutKeyClass {
+    public static class ByteArrayWithoutKey {
 
         @Redis("test:bytes")
         private Byte[] injectedBytes;
@@ -124,7 +124,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleByteArrayWithoutKeyAllowNullClass {
+    public static class ByteArrayWithoutKeyAllowNull {
 
         @Redis(value = "test:bytes", allowNull = true)
         private Byte[] injectedBytes;
@@ -136,7 +136,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SinglePrimitiveBooleanWithoutKeyClass {
+    public static class PrimitiveBooleanWithoutKey {
 
         @Redis("test:boolean")
         private boolean injectedBoolean;
@@ -146,7 +146,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SinglePrimitiveBooleanWithoutKeyAllowNullClass {
+    public static class PrimitiveBooleanWithoutKeyAllowNull {
 
         @Redis(value = "test:boolean", allowNull = true)
         private boolean injectedBoolean;
@@ -156,7 +156,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
 
-    public static class SingleBooleanWithoutKeyClass {
+    public static class BooleanWithoutKey {
 
         @Redis("test:boolean")
         private Boolean injectedBoolean;
@@ -166,7 +166,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleBooleanWithoutKeyAllowNullClass {
+    public static class BooleanWithoutKeyAllowNull {
 
         @Redis(value = "test:boolean", allowNull = true)
         private Boolean injectedBoolean;
@@ -178,7 +178,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SinglePrimitiveIntegerWithoutKeyClass {
+    public static class PrimitiveIntegerWithoutKey {
 
         @Redis("test:integer")
         private int injectedInteger;
@@ -188,7 +188,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SinglePrimitiveIntegerWithoutKeyAllowNullClass {
+    public static class PrimitiveIntegerWithoutKeyAllowNull {
 
         @Redis(value = "test:integer", allowNull = true)
         private int injectedInteger;
@@ -198,7 +198,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
 
-    public static class SingleIntegerWithoutKeyClass {
+    public static class IntegerWithoutKey {
 
         @Redis("test:integer")
         private Integer injectedInteger;
@@ -208,7 +208,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleIntegerWithoutKeyAllowNullClass {
+    public static class IntegerWithoutKeyAllowNull {
 
         @Redis(value = "test:integer", allowNull = true)
         private Integer injectedInteger;
@@ -220,7 +220,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SinglePrimitiveDoubleWithoutKeyClass {
+    public static class PrimitiveDoubleWithoutKey {
 
         @Redis("test:double")
         private double injectedDouble;
@@ -230,7 +230,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SinglePrimitiveDoubleWithoutKeyAllowNullClass {
+    public static class PrimitiveDoubleWithoutKeyAllowNull {
 
         @Redis(value = "test:double", allowNull = true)
         private double injectedDouble;
@@ -240,7 +240,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
 
-    public static class SingleDoubleWithoutKeyClass {
+    public static class DoubleWithoutKey {
 
         @Redis("test:double")
         private Double injectedDouble;
@@ -250,7 +250,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleDoubleWithoutKeyAllowNullClass {
+    public static class DoubleWithoutKeyAllowNull {
 
         @Redis(value = "test:double", allowNull = true)
         private Double injectedDouble;
@@ -262,7 +262,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
-    public static class SingleStringWithKeyClass {
+    public static class StringWithKey {
 
         @Redis(value = "test:string", includeKeys = true)
         private Map<String, String> injectedString;
@@ -272,7 +272,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
 
-    public static class SingleStringInListWithoutKeyClass {
+    public static class StringInListWithoutKey {
 
         @Redis("test:string")
         private List<String> injectedString;
@@ -282,7 +282,7 @@ public class PrimitiveInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SingleStringInSetWithoutKeyClass {
+    public static class StringInSetWithoutKey {
         
         @Redis("test:string")
         private Set<String> injectedString;
@@ -316,321 +316,320 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_primitive_char_array_field() {
+    public void test_that_string_without_key_is_injected_into_primitive_char_array() {
         this.jedis.set("test:chars", "test_value");
-        SinglePrimitiveCharArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveCharArrayWithoutKeyClass.class);
+        PrimitiveCharArrayWithoutKey dummy = this.injector.getInstance(
+            PrimitiveCharArrayWithoutKey.class);
         assertThat(dummy.getInjectedChars(), is(equalTo("test_value".toCharArray())));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_primitive_char_array_field() {
-        SinglePrimitiveCharArrayWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SinglePrimitiveCharArrayWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_primitive_char_array() {
+        PrimitiveCharArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
+            PrimitiveCharArrayWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedChars(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_empty_array_into_primitive_char_array_field() {
-        SinglePrimitiveCharArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveCharArrayWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_empty_array_into_primitive_char_array() {
+        PrimitiveCharArrayWithoutKey dummy = this.injector.getInstance(
+            PrimitiveCharArrayWithoutKey.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new char[]{})));
     }
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_char_array_field() {
+    public void test_that_string_without_key_is_injected_into_char_array() {
         this.jedis.set("test:chars", "test_value");
-        SingleCharArrayWithoutKeyClass dummy = this.injector.getInstance(SingleCharArrayWithoutKeyClass.class);
+        CharArrayWithoutKey dummy = this.injector.getInstance(CharArrayWithoutKey.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedChars()), is(equalTo("test_value".toCharArray())));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_char_array_field() {
-        SingleCharArrayWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleCharArrayWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_char_array() {
+        CharArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
+            CharArrayWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedChars(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_empty_array_into_char_array_field() {
-        SingleCharArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SingleCharArrayWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_empty_array_into_char_array() {
+        CharArrayWithoutKey dummy = this.injector.getInstance(CharArrayWithoutKey.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new Character[]{})));
     }
     
     
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_string_field() {
+    public void test_that_string_without_key_is_injected_into_string() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
-        SingleStringWithoutKeyClass dummy = this.injector.getInstance(SingleStringWithoutKeyClass.class);
+        StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
         assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_string_field() {
-        SingleStringWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleStringWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_string() {
+        StringWithoutKeyAllowNull dummy = this.injector.getInstance(
+            StringWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedString(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_blank_into_string_field() {
-        SingleStringWithoutKeyClass dummy = this.injector.getInstance(SingleStringWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_blank_into_string() {
+        StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
         assertThat(dummy.getInjectedString(), is(equalTo("")));
     }
     
     
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_primitive_byte_array_field() {
+    public void test_that_string_without_key_is_injected_into_primitive_byte_array() {
         this.jedis.set("test:bytes", "test_value");
-        SinglePrimitiveByteArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveByteArrayWithoutKeyClass.class);
+        PrimitiveByteArrayWithoutKey dummy = this.injector.getInstance(
+            PrimitiveByteArrayWithoutKey.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo("test_value".getBytes())));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_primitive_byte_array_field() {
-        SinglePrimitiveByteArrayWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SinglePrimitiveByteArrayWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_primitive_byte_array() {
+        PrimitiveByteArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
+            PrimitiveByteArrayWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedBytes(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_empty_array_into_primitive_byte_array_field() {
-        SinglePrimitiveByteArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveByteArrayWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_empty_array_into_primitive_byte_array() {
+        PrimitiveByteArrayWithoutKey dummy = this.injector.getInstance(
+            PrimitiveByteArrayWithoutKey.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new byte[]{})));
     }
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_byte_array_field() {
+    public void test_that_string_without_key_is_injected_into_byte_array() {
         this.jedis.set("test:bytes", "test_value");
-        SingleByteArrayWithoutKeyClass dummy = this.injector.getInstance(SingleByteArrayWithoutKeyClass.class);
+        ByteArrayWithoutKey dummy = this.injector.getInstance(ByteArrayWithoutKey.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedBytes()), is(equalTo("test_value".getBytes())));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_byte_array_field() {
-        SingleByteArrayWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleByteArrayWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_byte_array() {
+        ByteArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
+            ByteArrayWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedBytes(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_empty_array_into_byte_array_field() {
-        SingleByteArrayWithoutKeyClass dummy = this.injector.getInstance(
-            SingleByteArrayWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_empty_array_into_byte_array() {
+        ByteArrayWithoutKey dummy = this.injector.getInstance(
+            ByteArrayWithoutKey.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new Byte[]{})));
     }
     
     
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_primitive_boolean_field() {
+    public void test_that_string_without_key_is_converted_into_primitive_boolean() {
         this.jedis.set("test:boolean", "true");
-        SinglePrimitiveBooleanWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveBooleanWithoutKeyClass.class);
+        PrimitiveBooleanWithoutKey dummy = this.injector.getInstance(
+            PrimitiveBooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(true));
         this.jedis.set("test:boolean", "F");
-        dummy = this.injector.getInstance(SinglePrimitiveBooleanWithoutKeyClass.class);
+        dummy = this.injector.getInstance(PrimitiveBooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_boolean_to_null() {
-        this.injector.getInstance(SinglePrimitiveBooleanWithoutKeyAllowNullClass.class);
+        this.injector.getInstance(PrimitiveBooleanWithoutKeyAllowNull.class);
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_false_into_primitive_boolean_field() {
-        SinglePrimitiveBooleanWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveBooleanWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_false_into_primitive_boolean() {
+        PrimitiveBooleanWithoutKey dummy = this.injector.getInstance(
+            PrimitiveBooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_boolean() {
         this.jedis.set("test:boolean", "waar");
-        this.injector.getInstance(SinglePrimitiveBooleanWithoutKeyClass.class);
+        this.injector.getInstance(PrimitiveBooleanWithoutKey.class);
     }
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_boolean_field() {
+    public void test_that_string_without_key_is_converted_into_boolean() {
         this.jedis.set("test:boolean", "y");
-        SingleBooleanWithoutKeyClass dummy = this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
+        BooleanWithoutKey dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(true));
         this.jedis.set("test:boolean", "No");
-        dummy = this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
+        dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_boolean_field() {
-        SingleBooleanWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleBooleanWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_boolean() {
+        BooleanWithoutKeyAllowNull dummy = this.injector.getInstance(
+            BooleanWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedBoolean(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_false_into_boolean_field() {
-        SingleBooleanWithoutKeyClass dummy = this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_false_into_boolean() {
+        BooleanWithoutKey dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_boolean() {
         this.jedis.set("test:boolean", "vals");
-        this.injector.getInstance(SingleBooleanWithoutKeyClass.class);
+        this.injector.getInstance(BooleanWithoutKey.class);
     }
     
     
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_primitive_integer_field() {
+    public void test_that_string_without_key_is_converted_into_primitive_integer() {
         this.jedis.set("test:integer", "123");
-        SinglePrimitiveIntegerWithoutKeyClass dummy = this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyClass.class);
+        PrimitiveIntegerWithoutKey dummy = this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         this.jedis.set("test:integer", "-123");
-        dummy = this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyClass.class);
+        dummy = this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_integer_to_null() {
-        this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyAllowNullClass.class);
+        this.injector.getInstance(PrimitiveIntegerWithoutKeyAllowNull.class);
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_zero_into_primitive_integer_field() {
-        SinglePrimitiveIntegerWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveIntegerWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_integer() {
+        PrimitiveIntegerWithoutKey dummy = this.injector.getInstance(
+            PrimitiveIntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(0));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_integer() {
         this.jedis.set("test:integer", "invalid");
-        this.injector.getInstance(SinglePrimitiveIntegerWithoutKeyClass.class);
+        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
     }
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_integer_field() {
+    public void test_that_string_without_key_is_converted_into_integer() {
         this.jedis.set("test:integer", "123");
-        SingleIntegerWithoutKeyClass dummy = this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
+        IntegerWithoutKey dummy = this.injector.getInstance(IntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         this.jedis.set("test:integer", "-123");
-        dummy = this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
+        dummy = this.injector.getInstance(IntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_integer_field() {
-        SingleIntegerWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleIntegerWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_integer() {
+        IntegerWithoutKeyAllowNull dummy = this.injector.getInstance(
+            IntegerWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedInteger(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_zero_into_integer_field() {
-        SingleIntegerWithoutKeyClass dummy = this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_zero_into_integer() {
+        IntegerWithoutKey dummy = this.injector.getInstance(IntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(0));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "invalid");
-        this.injector.getInstance(SingleIntegerWithoutKeyClass.class);
+        this.injector.getInstance(IntegerWithoutKey.class);
     }
     
     
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_primitive_double_field() {
+    public void test_that_string_without_key_is_converted_into_primitive_double() {
         this.jedis.set("test:double", "123.456");
-        SinglePrimitiveDoubleWithoutKeyClass dummy = this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyClass.class);
+        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(123.456));
         this.jedis.set("test:double", ".123");
-        dummy = this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyClass.class);
+        dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_double_to_null() {
-        this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyAllowNullClass.class);
+        this.injector.getInstance(PrimitiveDoubleWithoutKeyAllowNull.class);
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_zero_into_primitive_double_field() {
-        SinglePrimitiveDoubleWithoutKeyClass dummy = this.injector.getInstance(
-            SinglePrimitiveDoubleWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_double() {
+        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
+            PrimitiveDoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.0));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_double() {
         this.jedis.set("test:double", "invalid");
-        this.injector.getInstance(SinglePrimitiveDoubleWithoutKeyClass.class);
+        this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
     }
     
     @Test
-    public void test_that_single_string_without_key_is_converted_into_double_field() {
+    public void test_that_string_without_key_is_converted_into_double() {
         this.jedis.set("test:double", "123.456");
-        SingleDoubleWithoutKeyClass dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(123.456));
         this.jedis.set("test:double", ".123");
-        dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+        dummy = this.injector.getInstance(DoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_null_into_double_field() {
-        SingleDoubleWithoutKeyAllowNullClass dummy = this.injector.getInstance(
-            SingleDoubleWithoutKeyAllowNullClass.class);
+    public void test_that_missing_value_is_injected_as_null_into_double() {
+        DoubleWithoutKeyAllowNull dummy = this.injector.getInstance(
+            DoubleWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedDouble(), is(nullValue()));
     }
     
     @Test
-    public void test_that_missing_value_is_injected_as_zero_into_double_field() {
-        SingleDoubleWithoutKeyClass dummy = this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+    public void test_that_missing_value_is_injected_as_zero_into_double() {
+        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.0));
     }
     
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_double() {
         this.jedis.set("test:double", "invalid");
-        this.injector.getInstance(SingleDoubleWithoutKeyClass.class);
+        this.injector.getInstance(DoubleWithoutKey.class);
     }
     
     
     
     @Test
-    public void test_that_single_string_with_key_is_injected_into_map_field() {
+    public void test_that_string_with_key_is_injected_into_map() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
-        SingleStringWithKeyClass dummy = this.injector.getInstance(SingleStringWithKeyClass.class);
+        StringWithKey dummy = this.injector.getInstance(StringWithKey.class);
         Map<String, String> actualStringMap = dummy.getInjectedString();
         assertThat(actualStringMap.size(), is(1));
         assertThat(actualStringMap.get("test:string"), is(equalTo(expectedString)));
     }
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_list_field() {
+    public void test_that_string_without_key_is_injected_into_list() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
-        SingleStringInListWithoutKeyClass dummy = this.injector.getInstance(SingleStringInListWithoutKeyClass.class);
+        StringInListWithoutKey dummy = this.injector.getInstance(StringInListWithoutKey.class);
         List<String> actualStringList = dummy.getInjectedString();
         assertThat(actualStringList.size(), is(1));
         assertThat(actualStringList.get(0), is(equalTo(expectedString)));
     }
     
     @Test
-    public void test_that_single_string_without_key_is_injected_into_set_field() {
+    public void test_that_string_without_key_is_injected_into_set() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
-        SingleStringInSetWithoutKeyClass dummy = this.injector.getInstance(SingleStringInSetWithoutKeyClass.class);
+        StringInSetWithoutKey dummy = this.injector.getInstance(StringInSetWithoutKey.class);
         Set<String> actualStringSet = dummy.getInjectedString();
         assertThat(actualStringSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualStringSet), is(equalTo(expectedString)));

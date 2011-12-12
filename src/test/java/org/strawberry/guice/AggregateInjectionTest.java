@@ -31,7 +31,7 @@ public class AggregateInjectionTest extends AbstractModule {
     private Injector injector;
     private Jedis jedis;
     
-    public static class MultiStringsWithoutKeysInjectClass {
+    public static class StringsWithoutKeys {
         
         @Redis("test:string:*")
         private List<String> injectedStrings;
@@ -41,7 +41,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiStringsWithKeysInjectClass {
+    public static class StringsWithKeys {
         
         @Redis(value = "test:string:*", includeKeys = true)
         private Map<String, String> injectedStrings;
@@ -53,7 +53,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class MultiMapsWithoutKeysInjectClass {
+    public static class MapsWithoutKeys {
         
         @Redis("test:map:*")
         private List<Map<String, String>> injectedMaps;
@@ -63,7 +63,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiMapsWithKeysInjectClass {
+    public static class MapsWithKeys {
         
         @Redis(value = "test:map:*", includeKeys = true)
         private Map<String, Map<String, String>> injectedMaps;
@@ -75,7 +75,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class MultiListsWithoutKeysInjectClass {
+    public static class ListsWithoutKeys {
         
         @Redis("test:list:*")
         private List<List<String>> injectedLists;
@@ -85,7 +85,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiListsWithKeysInjectClass {
+    public static class ListsWithKeys {
         
         @Redis(value = "test:list:*", includeKeys = true)
         private Map<String, List<String>> injectedLists;
@@ -97,7 +97,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class MultiSetsWithoutKeysInjectClass {
+    public static class SetsWithoutKeys {
         
         @Redis("test:set:*")
         private List<Set<String>> injectedSets;
@@ -107,7 +107,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiSetsWithKeysInjectClass {
+    public static class SetsWithKeys {
         
         @Redis(value = "test:set:*", includeKeys = true)
         private Map<String, Set<String>> injectedSets;
@@ -119,7 +119,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class MultiOrderedSetsWithoutKeysInjectClass {
+    public static class OrderedSetsWithoutKeys {
         
         @Redis("test:zset:*")
         private List<Set<String>> injectedSets;
@@ -129,7 +129,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiOrderedSetsWithKeysInjectClass {
+    public static class OrderedSetsWithKeys {
         
         @Redis(value = "test:zset:*", includeKeys = true)
         private Map<String, Set<String>> injectedSets;
@@ -140,7 +140,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
-    public static class MultiHeterogeneousWithoutKeysInjectClass {
+    public static class HeterogeneousWithoutKeys {
         
         @Redis(value = "test:heterogeneous:*")
         private List<Object> injectedObjects;
@@ -150,7 +150,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MultiHeterogeneousWithKeysInjectClass {
+    public static class HeterogeneousWithKeys {
         
         @Redis(value = "test:heterogeneous:*", includeKeys = true)
         private Map<String, Object> injectedObjects;
@@ -159,6 +159,7 @@ public class AggregateInjectionTest extends AbstractModule {
             return this.injectedObjects;
         }
     }
+    
     
     
     @Override
@@ -179,35 +180,37 @@ public class AggregateInjectionTest extends AbstractModule {
         }
         this.pool.returnResource(this.jedis);
     }
-
+    
+    
+    
     @Test
-    public void test_that_multiple_strings_without_keys_are_injected_into_list_field() {
+    public void test_that_strings_without_keys_are_injected_into_list() {
         String testString = "test_value:%s";
         List<String> expectedList = Lists.newArrayList();
         for (int i = 0; i < 10; ++i) {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedList.add(String.format(testString, i));
         }
-        MultiStringsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiStringsWithoutKeysInjectClass.class);
+        StringsWithoutKeys dummy = this.injector.getInstance(StringsWithoutKeys.class);
         assertThat(Sets.newHashSet(dummy.getInjectedStrings()), is(equalTo(Sets.newHashSet(expectedList))));
     }
     
     @Test
-    public void test_that_multiple_strings_with_keys_are_injected_into_map_field() {
+    public void test_that_strings_with_keys_are_injected_into_map() {
         String testString = "test_value:%s";
         Map<String, String> expectedMap = Maps.newLinkedHashMap();
         for (int i = 0; i < 10; ++i) {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedMap.put(String.format("test:string:%s", i), String.format(testString, i));
         }
-        MultiStringsWithKeysInjectClass dummy = this.injector.getInstance(MultiStringsWithKeysInjectClass.class);
+        StringsWithKeys dummy = this.injector.getInstance(StringsWithKeys.class);
         assertThat(dummy.getInjectedStrings(), is(equalTo(expectedMap)));
     }
     
     
     
     @Test
-    public void test_that_multiple_maps_without_keys_are_injected_into_list_of_map_field() {
+    public void test_that_maps_without_keys_are_injected_into_list_of_map() {
         for (int i = 0; i < 10; ++i) {
             Map<String, String> testMap = ImmutableMap.of(
                 String.format("key_%s1", i), String.format("value_%s1", i),
@@ -216,7 +219,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        MultiMapsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiMapsWithoutKeysInjectClass.class);
+        MapsWithoutKeys dummy = this.injector.getInstance(MapsWithoutKeys.class);
         List<Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -230,7 +233,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_multiple_maps_with_keys_are_injected_into_map_of_map_field() {
+    public void test_that_maps_with_keys_are_injected_into_map_of_map() {
         for (int i = 0; i < 10; ++i) {
             Map<String, String> testMap = ImmutableMap.of(
                 String.format("key_%s1", i), String.format("value_%s1", i),
@@ -239,7 +242,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        MultiMapsWithKeysInjectClass dummy = this.injector.getInstance(MultiMapsWithKeysInjectClass.class);
+        MapsWithKeys dummy = this.injector.getInstance(MapsWithKeys.class);
         Map<String, Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -255,14 +258,14 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     @Test
-    public void test_that_multiple_lists_without_keys_are_injected_into_list_of_list_field() {
+    public void test_that_lists_without_keys_are_injected_into_list_of_list() {
         List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        MultiListsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiListsWithoutKeysInjectClass.class);
+        ListsWithoutKeys dummy = this.injector.getInstance(ListsWithoutKeys.class);
         List<List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -276,14 +279,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_multiple_lists_with_keys_are_injected_into_map_of_list_field() {
+    public void test_that_lists_with_keys_are_injected_into_map_of_list() {
         List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        MultiListsWithKeysInjectClass dummy = this.injector.getInstance(MultiListsWithKeysInjectClass.class);
+        ListsWithKeys dummy = this.injector.getInstance(ListsWithKeys.class);
         Map<String, List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -299,14 +302,14 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     @Test
-    public void test_that_multiple_sets_without_keys_are_injected_into_list_of_set_field() {
+    public void test_that_sets_without_keys_are_injected_into_list_of_set() {
         Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testSet) {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        MultiSetsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiSetsWithoutKeysInjectClass.class);
+        SetsWithoutKeys dummy = this.injector.getInstance(SetsWithoutKeys.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -320,14 +323,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_multiple_sets_with_keys_are_injected_into_map_of_set_field() {
+    public void test_that_sets_with_keys_are_injected_into_map_of_set() {
         Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testSet) {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        MultiSetsWithKeysInjectClass dummy = this.injector.getInstance(MultiSetsWithKeysInjectClass.class);
+        SetsWithKeys dummy = this.injector.getInstance(SetsWithKeys.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -343,14 +346,14 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     @Test
-    public void test_that_multiple_ordered_sets_without_keys_are_injected_into_list_of_set_field() {
+    public void test_that_ordered_sets_without_keys_are_injected_into_list_of_set() {
         List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        MultiOrderedSetsWithoutKeysInjectClass dummy = this.injector.getInstance(MultiOrderedSetsWithoutKeysInjectClass.class);
+        OrderedSetsWithoutKeys dummy = this.injector.getInstance(OrderedSetsWithoutKeys.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -366,14 +369,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_multiple_ordered_sets_with_keys_are_injected_into_map_of_set_field() {
+    public void test_that_ordered_sets_with_keys_are_injected_into_map_of_set() {
         List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        MultiOrderedSetsWithKeysInjectClass dummy = this.injector.getInstance(MultiOrderedSetsWithKeysInjectClass.class);
+        OrderedSetsWithKeys dummy = this.injector.getInstance(OrderedSetsWithKeys.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -391,7 +394,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     @Test
-    public void test_that_multiple_objects_without_keys_are_injected_into_list_of_objects_field() {
+    public void test_that_objects_without_keys_are_injected_into_list_of_objects() {
         // Inject some strings.
         for (int i = 0; i < 3; ++i) {
             this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
@@ -431,7 +434,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        MultiHeterogeneousWithoutKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithoutKeysInjectClass.class);
+        HeterogeneousWithoutKeys dummy = this.injector.getInstance(HeterogeneousWithoutKeys.class);
         List<Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         
@@ -482,7 +485,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_multiple_objects_with_keys_are_injected_into_map_of_objects_field() {
+    public void test_that_objects_with_keys_are_injected_into_map_of_objects() {
         // Inject some strings.
         for (int i = 0; i < 3; ++i) {
             this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
@@ -522,7 +525,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        MultiHeterogeneousWithKeysInjectClass dummy = this.injector.getInstance(MultiHeterogeneousWithKeysInjectClass.class);
+        HeterogeneousWithKeys dummy = this.injector.getInstance(HeterogeneousWithKeys.class);
         Map<String, Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         
