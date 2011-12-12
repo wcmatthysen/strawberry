@@ -72,6 +72,48 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
+    public static class PrimitiveCharWithoutKey {
+        
+        @Redis("test:char")
+        private char injectedChar;
+        
+        public char getInjectedChar() {
+            return this.injectedChar;
+        }
+    }
+    
+    public static class PrimitiveCharWithoutKeyAllowNull {
+        
+        @Redis(value = "test:char", allowNull = true)
+        private char injectedChar;
+        
+        public char getInjectedChar() {
+            return this.injectedChar;
+        }
+    }
+    
+    public static class CharWithoutKey {
+        
+        @Redis("test:char")
+        private Character injectedChar;
+        
+        public Character getInjectedChar() {
+            return this.injectedChar;
+        }
+    }
+    
+    public static class CharWithoutKeyAllowNull {
+        
+        @Redis(value = "test:char", allowNull = true)
+        private Character injectedChar;
+        
+        public Character getInjectedChar() {
+            return this.injectedChar;
+        }
+    }
+    
+    
+    
     public static class StringWithoutKey {
 
         @Redis("test:string")
@@ -136,6 +178,48 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
+    public static class PrimitiveByteWithoutKey {
+
+        @Redis("test:byte")
+        private byte injectedByte;
+
+        public byte getInjectedByte() {
+            return this.injectedByte;
+        }
+    }
+    
+    public static class PrimitiveByteWithoutKeyAllowNull {
+
+        @Redis(value = "test:byte", allowNull = true)
+        private byte injectedByte;
+
+        public byte getInjectedByte() {
+            return this.injectedByte;
+        }
+    }
+
+    public static class ByteWithoutKey {
+
+        @Redis("test:byte")
+        private Byte injectedByte;
+
+        public Byte getInjectedByte() {
+            return this.injectedByte;
+        }
+    }
+    
+    public static class ByteWithoutKeyAllowNull {
+
+        @Redis(value = "test:byte", allowNull = true)
+        private Byte injectedByte;
+
+        public Byte getInjectedByte() {
+            return this.injectedByte;
+        }
+    }
+    
+    
+    
     public static class PrimitiveBooleanWithoutKey {
 
         @Redis("test:boolean")
@@ -178,6 +262,48 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     
+    public static class PrimitiveShortWithoutKey {
+
+        @Redis("test:short")
+        private short injectedShort;
+
+        public short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+    
+    public static class PrimitiveShortWithoutKeyAllowNull {
+
+        @Redis(value = "test:short", allowNull = true)
+        private short injectedShort;
+
+        public short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+
+    public static class ShortWithoutKey {
+
+        @Redis("test:short")
+        private Short injectedShort;
+
+        public Short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+    
+    public static class ShortWithoutKeyAllowNull {
+
+        @Redis(value = "test:short", allowNull = true)
+        private Short injectedShort;
+
+        public Short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+    
+    
+    
     public static class PrimitiveIntegerWithoutKey {
 
         @Redis("test:integer")
@@ -215,6 +341,90 @@ public class PrimitiveInjectionTest extends AbstractModule {
 
         public Integer getInjectedInteger() {
             return this.injectedInteger;
+        }
+    }
+    
+    
+    
+    public static class PrimitiveLongWithoutKey {
+
+        @Redis("test:long")
+        private long injectedLong;
+
+        public long getInjectedLong() {
+            return this.injectedLong;
+        }
+    }
+    
+    public static class PrimitiveLongWithoutKeyAllowNull {
+
+        @Redis(value = "test:long", allowNull = true)
+        private long injectedLong;
+
+        public long getInjectedLong() {
+            return this.injectedLong;
+        }
+    }
+
+    public static class LongWithoutKey {
+
+        @Redis("test:long")
+        private Long injectedLong;
+
+        public Long getInjectedLong() {
+            return this.injectedLong;
+        }
+    }
+    
+    public static class LongWithoutKeyAllowNull {
+
+        @Redis(value = "test:long", allowNull = true)
+        private Long injectedLong;
+
+        public Long getInjectedLong() {
+            return this.injectedLong;
+        }
+    }
+    
+    
+    
+    public static class PrimitiveFloatWithoutKey {
+
+        @Redis("test:float")
+        private float injectedFloat;
+
+        public float getInjectedFloat() {
+            return this.injectedFloat;
+        }
+    }
+    
+    public static class PrimitiveFloatWithoutKeyAllowNull {
+
+        @Redis(value = "test:float", allowNull = true)
+        private float injectedFloat;
+
+        public float getInjectedFloat() {
+            return this.injectedFloat;
+        }
+    }
+
+    public static class FloatWithoutKey {
+
+        @Redis("test:float")
+        private Float injectedFloat;
+
+        public Float getInjectedFloat() {
+            return this.injectedFloat;
+        }
+    }
+    
+    public static class FloatWithoutKeyAllowNull {
+
+        @Redis(value = "test:float", allowNull = true)
+        private Float injectedFloat;
+
+        public Float getInjectedFloat() {
+            return this.injectedFloat;
         }
     }
     
@@ -360,6 +570,58 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     @Test
+    public void test_that_string_without_key_is_converted_into_primitive_char() {
+        this.jedis.set("test:char", "A");
+        PrimitiveCharWithoutKey dummy = this.injector.getInstance(PrimitiveCharWithoutKey.class);
+        assertThat(dummy.getInjectedChar(), is('A'));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_missing_value_causes_exception_when_setting_primitive_char_to_null() {
+        this.injector.getInstance(PrimitiveCharWithoutKeyAllowNull.class);
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_character_into_primitive_char() {
+        PrimitiveCharWithoutKey dummy = this.injector.getInstance(PrimitiveCharWithoutKey.class);
+        assertThat(dummy.getInjectedChar(), is('\0'));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_char() {
+        this.jedis.set("test:char", "invalid");
+        this.injector.getInstance(PrimitiveCharWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_char() {
+        this.jedis.set("test:char", "A");
+        CharWithoutKey dummy = this.injector.getInstance(CharWithoutKey.class);
+        assertThat(dummy.getInjectedChar(), is('A'));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_char() {
+        CharWithoutKeyAllowNull dummy = this.injector.getInstance(
+            CharWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedChar(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_char() {
+        CharWithoutKey dummy = this.injector.getInstance(CharWithoutKey.class);
+        assertThat(dummy.getInjectedChar(), is('\0'));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_char() {
+        this.jedis.set("test:char", "invalid");
+        this.injector.getInstance(CharWithoutKey.class);
+    }
+    
+    
+    
+    @Test
     public void test_that_string_without_key_is_injected_into_string() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
@@ -428,6 +690,65 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     @Test
+    public void test_that_string_without_key_is_converted_into_primitive_byte() {
+        this.jedis.set("test:byte", "12");
+        PrimitiveByteWithoutKey dummy = this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)12));
+        this.jedis.set("test:byte", "-13");
+        dummy = this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)-13));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_missing_value_causes_exception_when_setting_primitive_byte_to_null() {
+        this.injector.getInstance(PrimitiveByteWithoutKeyAllowNull.class);
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_byte() {
+        PrimitiveByteWithoutKey dummy = this.injector.getInstance(
+            PrimitiveByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)0));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_byte() {
+        this.jedis.set("test:byte", "invalid");
+        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_byte() {
+        this.jedis.set("test:byte", "12");
+        ByteWithoutKey dummy = this.injector.getInstance(ByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)12));
+        this.jedis.set("test:byte", "-13");
+        dummy = this.injector.getInstance(ByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)-13));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_byte() {
+        ByteWithoutKeyAllowNull dummy = this.injector.getInstance(
+            ByteWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedByte(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_byte() {
+        ByteWithoutKey dummy = this.injector.getInstance(ByteWithoutKey.class);
+        assertThat(dummy.getInjectedByte(), is((byte)0));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_byte() {
+        this.jedis.set("test:byte", "invalid");
+        this.injector.getInstance(ByteWithoutKey.class);
+    }
+    
+    
+    
+    @Test
     public void test_that_string_without_key_is_converted_into_primitive_boolean() {
         this.jedis.set("test:boolean", "true");
         PrimitiveBooleanWithoutKey dummy = this.injector.getInstance(
@@ -488,6 +809,65 @@ public class PrimitiveInjectionTest extends AbstractModule {
     
     
     @Test
+    public void test_that_string_without_key_is_converted_into_primitive_short() {
+        this.jedis.set("test:short", "123");
+        PrimitiveShortWithoutKey dummy = this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)123));
+        this.jedis.set("test:short", "-123");
+        dummy = this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)-123));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_missing_value_causes_exception_when_setting_primitive_short_to_null() {
+        this.injector.getInstance(PrimitiveShortWithoutKeyAllowNull.class);
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_short() {
+        PrimitiveShortWithoutKey dummy = this.injector.getInstance(
+            PrimitiveShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)0));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_short() {
+        this.jedis.set("test:short", "invalid");
+        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_short() {
+        this.jedis.set("test:short", "123");
+        ShortWithoutKey dummy = this.injector.getInstance(ShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)123));
+        this.jedis.set("test:short", "-123");
+        dummy = this.injector.getInstance(ShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)-123));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_short() {
+        ShortWithoutKeyAllowNull dummy = this.injector.getInstance(
+            ShortWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedShort(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_short() {
+        ShortWithoutKey dummy = this.injector.getInstance(ShortWithoutKey.class);
+        assertThat(dummy.getInjectedShort(), is((short)0));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_short() {
+        this.jedis.set("test:short", "invalid");
+        this.injector.getInstance(ShortWithoutKey.class);
+    }
+    
+    
+    
+    @Test
     public void test_that_string_without_key_is_converted_into_primitive_integer() {
         this.jedis.set("test:integer", "123");
         PrimitiveIntegerWithoutKey dummy = this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
@@ -542,6 +922,124 @@ public class PrimitiveInjectionTest extends AbstractModule {
     public void test_that_invalid_string_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "invalid");
         this.injector.getInstance(IntegerWithoutKey.class);
+    }
+    
+    
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_primitive_long() {
+        this.jedis.set("test:long", "123");
+        PrimitiveLongWithoutKey dummy = this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(123L));
+        this.jedis.set("test:long", "-123");
+        dummy = this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(-123L));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_missing_value_causes_exception_when_setting_primitive_long_to_null() {
+        this.injector.getInstance(PrimitiveLongWithoutKeyAllowNull.class);
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_long() {
+        PrimitiveLongWithoutKey dummy = this.injector.getInstance(
+            PrimitiveLongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(0L));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_long() {
+        this.jedis.set("test:long", "invalid");
+        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_long() {
+        this.jedis.set("test:long", "123");
+        LongWithoutKey dummy = this.injector.getInstance(LongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(123L));
+        this.jedis.set("test:long", "-123");
+        dummy = this.injector.getInstance(LongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(-123L));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_long() {
+        LongWithoutKeyAllowNull dummy = this.injector.getInstance(
+            LongWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedLong(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_long() {
+        LongWithoutKey dummy = this.injector.getInstance(LongWithoutKey.class);
+        assertThat(dummy.getInjectedLong(), is(0L));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_long() {
+        this.jedis.set("test:long", "invalid");
+        this.injector.getInstance(LongWithoutKey.class);
+    }
+    
+    
+    
+   @Test
+    public void test_that_string_without_key_is_converted_into_primitive_float() {
+        this.jedis.set("test:float", "123.456");
+        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(123.456f));
+        this.jedis.set("test:float", ".123");
+        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(0.123f));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_missing_value_causes_exception_when_setting_primitive_float_to_null() {
+        this.injector.getInstance(PrimitiveFloatWithoutKeyAllowNull.class);
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_primitive_float() {
+        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
+            PrimitiveFloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(0.0f));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_primitive_float() {
+        this.jedis.set("test:float", "invalid");
+        this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_string_without_key_is_converted_into_float() {
+        this.jedis.set("test:float", "123.456");
+        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(123.456f));
+        this.jedis.set("test:float", ".123");
+        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(0.123f));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_float() {
+        FloatWithoutKeyAllowNull dummy = this.injector.getInstance(
+            FloatWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedFloat(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_zero_into_float() {
+        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(0.0f));
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_invalid_string_throws_exception_when_converting_to_float() {
+        this.jedis.set("test:float", "invalid");
+        this.injector.getInstance(FloatWithoutKey.class);
     }
     
     

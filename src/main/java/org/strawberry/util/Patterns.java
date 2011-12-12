@@ -12,7 +12,7 @@ public final class Patterns {
     
     public static final Pattern INTEGER = Pattern.compile("^[-]?\\d+$");
     
-    public static final Pattern BOOLEAN = Pattern.compile("^t|true|y|yes|f|false|n|no$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern BOOLEAN = Pattern.compile("^t|true|y|yes|1|f|false|n|no|0$", Pattern.CASE_INSENSITIVE);
     
-    public static final Pattern TRUE = Pattern.compile("^t|true|y|yes$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern TRUE = Pattern.compile("^t|true|y|yes|1$", Pattern.CASE_INSENSITIVE);
 }

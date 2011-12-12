@@ -140,6 +140,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
     public static class HeterogeneousWithoutKeys {
         
         @Redis(value = "test:heterogeneous:*")
