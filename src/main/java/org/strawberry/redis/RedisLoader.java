@@ -199,7 +199,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = jedis.get(redisKey).charAt(0);
                             } else {
                                 throw new IllegalArgumentException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(String.class)) {
                             value = jedis.get(redisKey);
@@ -208,7 +208,13 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         } else if (fieldType.equals(Byte[].class)) {
                             value = ArrayUtils.toObject(jedis.get(redisKey.getBytes()));
                         } else if (fieldType.equals(byte.class) || fieldType.equals(Byte.class)) {
+                            String toConvert = jedis.get(redisKey);
+                            try {
                             value = Byte.parseByte(jedis.get(redisKey));
+                            } catch (NumberFormatException e) {
+                                throw new NumberFormatException(String.format(
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                            }
                         } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                             String toConvert = jedis.get(redisKey);
                             if (Patterns.BOOLEAN.matcher(toConvert).matches()) {
@@ -223,7 +229,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Short.parseShort(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -231,7 +237,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Integer.parseInt(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -239,7 +245,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Long.parseLong(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -247,7 +253,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Double.parseDouble(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
                             String toConvert = jedis.get(redisKey);
@@ -255,7 +261,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 value = Float.parseFloat(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
                         } else if (fieldType.equals(Map.class)) {
                             value = jedis.hgetAll(redisKey);

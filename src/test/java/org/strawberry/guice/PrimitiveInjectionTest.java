@@ -717,6 +717,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(PrimitiveByteWithoutKey.class);
     }
     
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_primitive_byte() {
+        this.jedis.set("test:byte", "-129");
+        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_primitive_byte() {
+        this.jedis.set("test:byte", "128");
+        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+    }
+    
     @Test
     public void test_that_string_without_key_is_converted_into_byte() {
         this.jedis.set("test:byte", "12");
@@ -743,6 +755,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_byte() {
         this.jedis.set("test:byte", "invalid");
+        this.injector.getInstance(ByteWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_byte() {
+        this.jedis.set("test:byte", "-129");
+        this.injector.getInstance(ByteWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_byte() {
+        this.jedis.set("test:byte", "128");
         this.injector.getInstance(ByteWithoutKey.class);
     }
     
@@ -783,6 +807,12 @@ public class PrimitiveInjectionTest extends AbstractModule {
         BooleanWithoutKey dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(true));
         this.jedis.set("test:boolean", "No");
+        dummy = this.injector.getInstance(BooleanWithoutKey.class);
+        assertThat(dummy.getInjectedBoolean(), is(false));
+        this.jedis.set("test:boolean", "1");
+        dummy = this.injector.getInstance(BooleanWithoutKey.class);
+        assertThat(dummy.getInjectedBoolean(), is(true));
+        this.jedis.set("test:boolean", "FALSE");
         dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
@@ -836,6 +866,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(PrimitiveShortWithoutKey.class);
     }
     
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_primitive_short() {
+        this.jedis.set("test:short", "-32,769");
+        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_primitive_short() {
+        this.jedis.set("test:short", "32,768");
+        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+    }
+    
     @Test
     public void test_that_string_without_key_is_converted_into_short() {
         this.jedis.set("test:short", "123");
@@ -862,6 +904,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_short() {
         this.jedis.set("test:short", "invalid");
+        this.injector.getInstance(ShortWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_short() {
+        this.jedis.set("test:short", "-32,769");
+        this.injector.getInstance(ShortWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_short() {
+        this.jedis.set("test:short", "32,768");
         this.injector.getInstance(ShortWithoutKey.class);
     }
     
@@ -895,6 +949,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
     }
     
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_primitive_integer() {
+        this.jedis.set("test:integer", "-2,147,483,649");
+        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_primitive_integer() {
+        this.jedis.set("test:integer", "2,147,483,648");
+        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+    }
+    
     @Test
     public void test_that_string_without_key_is_converted_into_integer() {
         this.jedis.set("test:integer", "123");
@@ -921,6 +987,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "invalid");
+        this.injector.getInstance(IntegerWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_integer() {
+        this.jedis.set("test:integer", "-2,147,483,649");
+        this.injector.getInstance(IntegerWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_integer() {
+        this.jedis.set("test:integer", "2,147,483,648");
         this.injector.getInstance(IntegerWithoutKey.class);
     }
     
@@ -954,6 +1032,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(PrimitiveLongWithoutKey.class);
     }
     
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_primitive_long() {
+        this.jedis.set("test:long", "-9,223,372,036,854,775,809");
+        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_primitive_long() {
+        this.jedis.set("test:long", "9,223,372,036,854,775,808");
+        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+    }
+    
     @Test
     public void test_that_string_without_key_is_converted_into_long() {
         this.jedis.set("test:long", "123");
@@ -983,6 +1073,18 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(LongWithoutKey.class);
     }
     
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_small_value_throws_exception_when_converting_to_long() {
+        this.jedis.set("test:long", "-9,223,372,036,854,775,809");
+        this.injector.getInstance(LongWithoutKey.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void test_that_too_large_value_throws_exception_when_converting_to_long() {
+        this.jedis.set("test:long", "9,223,372,036,854,775,808");
+        this.injector.getInstance(LongWithoutKey.class);
+    }
+    
     
     
    @Test
@@ -993,6 +1095,12 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:float", ".123");
         dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
         assertThat(dummy.getInjectedFloat(), is(0.123f));
+        this.jedis.set("test:float", "1.23f");
+        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(1.23f));
+        this.jedis.set("test:float", "NaN");
+        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        assertThat(Float.isNaN(dummy.getInjectedFloat()), is(true));
     }
     
     @Test(expected = RuntimeException.class)
@@ -1014,6 +1122,22 @@ public class PrimitiveInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_too_small_value_overflows_to_infinity_when_converting_to_primitive_float() {
+        this.jedis.set("test:float", "-3.4028236e+38f");
+        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
+            PrimitiveFloatWithoutKey.class);
+        assertThat(Float.isInfinite(dummy.getInjectedFloat()), is(true));
+    }
+    
+    @Test
+    public void test_that_too_large_value_overflows_to_infinity_when_converting_to_primitive_float() {
+        this.jedis.set("test:float", "3.4028236e+38f");
+        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
+            PrimitiveFloatWithoutKey.class);
+        assertThat(Float.isInfinite(dummy.getInjectedFloat()), is(true));
+    }
+    
+    @Test
     public void test_that_string_without_key_is_converted_into_float() {
         this.jedis.set("test:float", "123.456");
         FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
@@ -1021,6 +1145,12 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:float", ".123");
         dummy = this.injector.getInstance(FloatWithoutKey.class);
         assertThat(dummy.getInjectedFloat(), is(0.123f));
+        this.jedis.set("test:float", "1.23f");
+        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat(), is(1.23f));
+        this.jedis.set("test:float", "NaN");
+        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat().isNaN(), is(true));
     }
     
     @Test
@@ -1042,6 +1172,20 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.injector.getInstance(FloatWithoutKey.class);
     }
     
+    @Test
+    public void test_that_too_small_value_overflows_to_infinity_when_converting_to_float() {
+        this.jedis.set("test:float", "-3.4028236e+38f");
+        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat().isInfinite(), is(true));
+    }
+    
+    @Test
+    public void test_that_too_large_value_overflows_to_infinity_when_converting_to_float() {
+        this.jedis.set("test:float", "3.4028236e+38f");
+        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        assertThat(dummy.getInjectedFloat().isInfinite(), is(true));
+    }
+    
     
     
     @Test
@@ -1052,6 +1196,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:double", ".123");
         dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
+        this.jedis.set("test:double", "NaN");
+        dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
+        assertThat(Double.isNaN(dummy.getInjectedDouble()), is(true));
     }
     
     @Test(expected = RuntimeException.class)
@@ -1073,6 +1220,22 @@ public class PrimitiveInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_too_small_value_overflows_to_infinity_when_converting_to_primitive_double() {
+        this.jedis.set("test:double", "-1.7976931348623159e+308");
+        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
+            PrimitiveDoubleWithoutKey.class);
+        assertThat(Double.isInfinite(dummy.getInjectedDouble()), is(true));
+    }
+    
+    @Test
+    public void test_that_too_large_value_overflows_to_infinity_when_converting_to_primitive_double() {
+        this.jedis.set("test:double", "1.7976931348623159e+308");
+        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
+            PrimitiveDoubleWithoutKey.class);
+        assertThat(Double.isInfinite(dummy.getInjectedDouble()), is(true));
+    }
+    
+    @Test
     public void test_that_string_without_key_is_converted_into_double() {
         this.jedis.set("test:double", "123.456");
         DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
@@ -1080,6 +1243,9 @@ public class PrimitiveInjectionTest extends AbstractModule {
         this.jedis.set("test:double", ".123");
         dummy = this.injector.getInstance(DoubleWithoutKey.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
+        this.jedis.set("test:double", "NaN");
+        dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        assertThat(dummy.getInjectedDouble().isNaN(), is(true));
     }
     
     @Test
@@ -1099,6 +1265,20 @@ public class PrimitiveInjectionTest extends AbstractModule {
     public void test_that_invalid_string_throws_exception_when_converting_to_double() {
         this.jedis.set("test:double", "invalid");
         this.injector.getInstance(DoubleWithoutKey.class);
+    }
+    
+    @Test
+    public void test_that_too_small_value_overflows_to_infinity_when_converting_to_double() {
+        this.jedis.set("test:double", "-1.7976931348623159e+308");
+        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        assertThat(dummy.getInjectedDouble().isInfinite(), is(true));
+    }
+    
+    @Test
+    public void test_that_too_large_value_overflows_to_infinity_when_converting_to_double() {
+        this.jedis.set("test:double", "1.7976931348623159e+308");
+        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        assertThat(dummy.getInjectedDouble().isInfinite(), is(true));
     }
     
     
