@@ -31,138 +31,6 @@ public class AggregateInjectionTest extends AbstractModule {
     private Injector injector;
     private Jedis jedis;
     
-    public static class StringsWithoutKeys {
-        
-        @Redis("test:string:*")
-        private List<String> injectedStrings;
-        
-        public List<String> getInjectedStrings() {
-            return this.injectedStrings;
-        }
-    }
-    
-    public static class StringsWithKeys {
-        
-        @Redis(value = "test:string:*", includeKeys = true)
-        private Map<String, String> injectedStrings;
-        
-        public Map<String, String> getInjectedStrings() {
-            return this.injectedStrings;
-        }
-    }
-    
-    
-    
-    public static class MapsWithoutKeys {
-        
-        @Redis("test:map:*")
-        private List<Map<String, String>> injectedMaps;
-        
-        public List<Map<String, String>> getInjectedMaps() {
-            return this.injectedMaps;
-        }
-    }
-    
-    public static class MapsWithKeys {
-        
-        @Redis(value = "test:map:*", includeKeys = true)
-        private Map<String, Map<String, String>> injectedMaps;
-        
-        public Map<String, Map<String, String>> getInjectedMaps() {
-            return this.injectedMaps;
-        }
-    }
-    
-    
-    
-    public static class ListsWithoutKeys {
-        
-        @Redis("test:list:*")
-        private List<List<String>> injectedLists;
-        
-        public List<List<String>> getInjectedLists() {
-            return this.injectedLists;
-        }
-    }
-    
-    public static class ListsWithKeys {
-        
-        @Redis(value = "test:list:*", includeKeys = true)
-        private Map<String, List<String>> injectedLists;
-        
-        public Map<String, List<String>> getInjectedLists() {
-            return this.injectedLists;
-        }
-    }
-    
-    
-    
-    public static class SetsWithoutKeys {
-        
-        @Redis("test:set:*")
-        private List<Set<String>> injectedSets;
-        
-        public List<Set<String>> getInjectedSets() {
-            return this.injectedSets;
-        }
-    }
-    
-    public static class SetsWithKeys {
-        
-        @Redis(value = "test:set:*", includeKeys = true)
-        private Map<String, Set<String>> injectedSets;
-        
-        public Map<String, Set<String>> getInjectedSets() {
-            return this.injectedSets;
-        }
-    }
-    
-    
-    
-    public static class OrderedSetsWithoutKeys {
-        
-        @Redis("test:zset:*")
-        private List<Set<String>> injectedSets;
-        
-        public List<Set<String>> getInjectedSets() {
-            return this.injectedSets;
-        }
-    }
-    
-    public static class OrderedSetsWithKeys {
-        
-        @Redis(value = "test:zset:*", includeKeys = true)
-        private Map<String, Set<String>> injectedSets;
-        
-        public Map<String, Set<String>> getInjectedSets() {
-            return this.injectedSets;
-        }
-    }
-    
-    
-    
-    public static class HeterogeneousWithoutKeys {
-        
-        @Redis(value = "test:heterogeneous:*")
-        private List<Object> injectedObjects;
-        
-        public List<Object> getInjectedObjects() {
-            return this.injectedObjects;
-        }
-    }
-    
-    public static class HeterogeneousWithKeys {
-        
-        @Redis(value = "test:heterogeneous:*", includeKeys = true)
-        private Map<String, Object> injectedObjects;
-        
-        public Map<String, Object> getInjectedObjects() {
-            return this.injectedObjects;
-        }
-    }
-    
-    
-    
     @Override
     protected void configure() {
         install(new RedisModule(this.pool));
@@ -183,6 +51,26 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
+    public static class StringsWithoutKeys {
+        
+        @Redis("test:string:*")
+        private List<String> injectedStrings;
+        
+        public List<String> getInjectedStrings() {
+            return this.injectedStrings;
+        }
+    }
+    
+    public static class StringsWithKeys {
+        
+        @Redis(value = "test:string:*", includeKeys = true)
+        private Map<String, String> injectedStrings;
+        
+        public Map<String, String> getInjectedStrings() {
+            return this.injectedStrings;
+        }
+    }
     
     @Test
     public void test_that_strings_without_keys_are_injected_into_list() {
@@ -209,6 +97,26 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
+    public static class MapsWithoutKeys {
+        
+        @Redis("test:map:*")
+        private List<Map<String, String>> injectedMaps;
+        
+        public List<Map<String, String>> getInjectedMaps() {
+            return this.injectedMaps;
+        }
+    }
+    
+    public static class MapsWithKeys {
+        
+        @Redis(value = "test:map:*", includeKeys = true)
+        private Map<String, Map<String, String>> injectedMaps;
+        
+        public Map<String, Map<String, String>> getInjectedMaps() {
+            return this.injectedMaps;
+        }
+    }
     
     @Test
     public void test_that_maps_without_keys_are_injected_into_list_of_map() {
@@ -258,6 +166,26 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
+    public static class ListsWithoutKeys {
+        
+        @Redis("test:list:*")
+        private List<List<String>> injectedLists;
+        
+        public List<List<String>> getInjectedLists() {
+            return this.injectedLists;
+        }
+    }
+    
+    public static class ListsWithKeys {
+        
+        @Redis(value = "test:list:*", includeKeys = true)
+        private Map<String, List<String>> injectedLists;
+        
+        public Map<String, List<String>> getInjectedLists() {
+            return this.injectedLists;
+        }
+    }
+    
     @Test
     public void test_that_lists_without_keys_are_injected_into_list_of_list() {
         List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
@@ -302,6 +230,26 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
+    public static class SetsWithoutKeys {
+        
+        @Redis("test:set:*")
+        private List<Set<String>> injectedSets;
+        
+        public List<Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
+    
+    public static class SetsWithKeys {
+        
+        @Redis(value = "test:set:*", includeKeys = true)
+        private Map<String, Set<String>> injectedSets;
+        
+        public Map<String, Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
+    
     @Test
     public void test_that_sets_without_keys_are_injected_into_list_of_set() {
         Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
@@ -345,6 +293,26 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
+    public static class OrderedSetsWithoutKeys {
+        
+        @Redis("test:zset:*")
+        private List<Set<String>> injectedSets;
+        
+        public List<Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
+    
+    public static class OrderedSetsWithKeys {
+        
+        @Redis(value = "test:zset:*", includeKeys = true)
+        private Map<String, Set<String>> injectedSets;
+        
+        public Map<String, Set<String>> getInjectedSets() {
+            return this.injectedSets;
+        }
+    }
     
     @Test
     public void test_that_ordered_sets_without_keys_are_injected_into_list_of_set() {
@@ -393,6 +361,26 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     
+    
+    public static class HeterogeneousWithoutKeys {
+        
+        @Redis(value = "test:heterogeneous:*")
+        private List<Object> injectedObjects;
+        
+        public List<Object> getInjectedObjects() {
+            return this.injectedObjects;
+        }
+    }
+    
+    public static class HeterogeneousWithKeys {
+        
+        @Redis(value = "test:heterogeneous:*", includeKeys = true)
+        private Map<String, Object> injectedObjects;
+        
+        public Map<String, Object> getInjectedObjects() {
+            return this.injectedObjects;
+        }
+    }
     
     @Test
     public void test_that_objects_without_keys_are_injected_into_list_of_objects() {
