@@ -14,13 +14,14 @@ public final class JedisUtil {
 
     private JedisUtil() {}
 
-    public static void destroyOnShutdown(final JedisPool pool) {
+    public static JedisPool destroyOnShutdown(final JedisPool pool) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 pool.destroy();
             }
         });
+        return pool;
     }
 
     public static interface LinkedCallbackBuilder {

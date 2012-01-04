@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.strawberry.util.JedisUtil.destroyOnShutdown;
 
 /**
  *
@@ -26,7 +27,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
  */
 public class MapInjectionTest extends AbstractModule {
     
-    private final JedisPool pool = new JedisPool("localhost", 6379);
+    private final JedisPool pool = destroyOnShutdown(new JedisPool("localhost", 6379));
     
     private Injector injector;
     private Jedis jedis;
