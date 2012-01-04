@@ -1,11 +1,13 @@
 package org.strawberry.guice;
 
+import java.lang.reflect.Field;
+
 import com.google.common.cache.Cache;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
+
 import fj.data.Option;
-import java.lang.reflect.Field;
 
 /**
  *

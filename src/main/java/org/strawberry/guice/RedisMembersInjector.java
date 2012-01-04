@@ -1,9 +1,11 @@
 package org.strawberry.guice;
 
+import java.lang.reflect.Field;
+
 import com.google.common.cache.Cache;
 import com.google.inject.MembersInjector;
+
 import fj.data.Option;
-import java.lang.reflect.Field;
 
 /**
  *

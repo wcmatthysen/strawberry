@@ -1,10 +1,11 @@
 package org.strawberry.util;
 
-import fj.Effect;
-import fj.F;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import fj.Effect;
+import fj.F;
 
 /**
  *

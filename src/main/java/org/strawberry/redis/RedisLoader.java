@@ -1,22 +1,26 @@
 package org.strawberry.redis;
 
-import java.util.Collection;
-import com.google.common.collect.Iterables;
-import org.strawberry.util.Patterns;
-import org.apache.commons.lang3.ArrayUtils;
-import com.google.common.cache.CacheLoader;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import fj.F;
-import fj.data.Option;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.strawberry.guice.Redis;
+import org.strawberry.util.Patterns;
+
+import com.google.common.cache.CacheLoader;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import fj.F;
+import fj.data.Option;
 
 import static org.strawberry.util.JedisUtil.using;
 
@@ -25,11 +29,11 @@ import static org.strawberry.util.JedisUtil.using;
  * @author Wiehann Matthysen
  */
 public final class RedisLoader extends CacheLoader<Field, Option> {
-    
+
     private enum JedisType {
         STRING, HASH, LIST, SET, ZSET
     }
-    
+
     private final JedisPool pool;
 
     public RedisLoader(JedisPool pool) {
@@ -40,7 +44,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
     public Option load(Field field) throws Exception {
         return loadFromRedis(this.pool, field.getType(), field.getAnnotation(Redis.class));
     }
-    
+
     private static Object nonNullValueOf(Class<?> type) {
         Object value = null;
         if (type.equals(char[].class)) {
@@ -78,7 +82,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         }
         return value;
     }
-    
+
     private static Map<String, ?> nestedMapOf(Jedis jedis, Set<String> redisKeys) {
         Map<String, Object> map = Maps.newLinkedHashMap();
         for (String redisKey : redisKeys) {
@@ -103,7 +107,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         }
         return map;
     }
-    
+
     private static List<?> nestedListOf(Jedis jedis, Set<String> redisKeys) {
         List<Object> list = Lists.newArrayList();
         for (String redisKey : redisKeys) {
@@ -128,7 +132,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         }
         return list;
     }
-    
+
     private static Collection<?> collectionOf(Class<?> fieldType, Jedis jedis, String key, boolean alwaysNest) {
         Collection<Object> collection = null;
         if (fieldType.equals(List.class)) {
@@ -168,7 +172,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         }
         return collection;
     }
-    
+
     private static Option loadFromRedis(JedisPool pool, final Class<?> fieldType, final Redis annotation) {
         return using(pool)._do(new F<Jedis, Option>() {
 

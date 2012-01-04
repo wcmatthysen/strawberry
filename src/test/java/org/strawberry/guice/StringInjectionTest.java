@@ -1,22 +1,25 @@
 package org.strawberry.guice;
 
-import com.google.common.collect.Iterables;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.strawberry.util.JedisUtil.destroyOnShutdown;
 
 /**
@@ -24,12 +27,12 @@ import static org.strawberry.util.JedisUtil.destroyOnShutdown;
  * @author Wiehann Matthysen
  */
 public class StringInjectionTest extends AbstractModule {
-    
+
     private final JedisPool pool = destroyOnShutdown(new JedisPool("localhost", 6379));
-    
+
     private Injector injector;
     private Jedis jedis;
-    
+
     @Override
     protected void configure() {
         install(new RedisModule(this.pool));
@@ -48,9 +51,9 @@ public class StringInjectionTest extends AbstractModule {
         }
         this.pool.returnResource(this.jedis);
     }
-    
-    
-    
+
+
+
     public static class StringWithoutKey {
 
         @Redis("test:string")
@@ -60,7 +63,7 @@ public class StringInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
-    
+
     public static class StringWithKey {
 
         @Redis(value = "test:string", includeKeys = true)
@@ -70,7 +73,7 @@ public class StringInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
-    
+
     public static class StringInListWithoutKey {
 
         @Redis("test:string")
@@ -80,17 +83,17 @@ public class StringInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
-    
+
     public static class StringInSetWithoutKey {
-        
+
         @Redis("test:string")
         private Set<String> injectedString;
-        
+
         public Set<String> getInjectedString() {
             return this.injectedString;
         }
     }
-    
+
     public static class StringWithoutKeyAllowNull {
 
         @Redis(value = "test:string", allowNull = true)
@@ -100,7 +103,7 @@ public class StringInjectionTest extends AbstractModule {
             return this.injectedString;
         }
     }
-    
+
     @Test
     public void test_that_string_without_key_is_injected_into_string() {
         String expectedString = "test_value";
@@ -108,7 +111,7 @@ public class StringInjectionTest extends AbstractModule {
         StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
         assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
     }
-    
+
     @Test
     public void test_that_string_with_key_is_injected_into_map() {
         String expectedString = "test_value";
@@ -118,7 +121,7 @@ public class StringInjectionTest extends AbstractModule {
         assertThat(actualStringMap.size(), is(1));
         assertThat(actualStringMap.get("test:string"), is(equalTo(expectedString)));
     }
-    
+
     @Test
     public void test_that_string_without_key_is_injected_into_list() {
         String expectedString = "test_value";
@@ -128,7 +131,7 @@ public class StringInjectionTest extends AbstractModule {
         assertThat(actualStringList.size(), is(1));
         assertThat(actualStringList.get(0), is(equalTo(expectedString)));
     }
-    
+
     @Test
     public void test_that_string_without_key_is_injected_into_set() {
         String expectedString = "test_value";
@@ -138,14 +141,14 @@ public class StringInjectionTest extends AbstractModule {
         assertThat(actualStringSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualStringSet), is(equalTo(expectedString)));
     }
-    
+
     @Test
     public void test_that_missing_value_is_injected_as_null_into_string() {
         StringWithoutKeyAllowNull dummy = this.injector.getInstance(
             StringWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedString(), is(nullValue()));
     }
-    
+
     @Test
     public void test_that_missing_value_is_injected_as_blank_into_string() {
         StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
