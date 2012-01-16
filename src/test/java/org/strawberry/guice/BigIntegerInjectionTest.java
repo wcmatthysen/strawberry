@@ -102,22 +102,22 @@ public class BigIntegerInjectionTest extends AbstractModule {
     @Test
     public void test_that_too_small_value_doesnt_throw_exception_when_converting_to_biginteger() {
         // Test for less than smallest integer.
-        this.jedis.set("test:biginteger", "-2,147,483,649");
+        this.jedis.set("test:biginteger", "-2147483649");
         this.injector.getInstance(BigIntegerWithoutKey.class);
 
         // Test for less than smallest long.
-        this.jedis.set("test:biginteger", "-9,223,372,036,854,775,809");
+        this.jedis.set("test:biginteger", "-9223372036854775809");
         this.injector.getInstance(BigIntegerWithoutKey.class);
     }
 
     @Test
     public void test_that_too_large_value_doesnt_throw_exception_when_converting_to_biginteger() {
         // Test for greater than largest integer.
-        this.jedis.set("test:biginteger", "2,147,483,648");
+        this.jedis.set("test:biginteger", "2147483648");
         this.injector.getInstance(BigIntegerWithoutKey.class);
 
         // Test for greater than largest long.
-        this.jedis.set("test:biginteger", "9,223,372,036,854,775,808");
+        this.jedis.set("test:biginteger", "9223372036854775808");
         this.injector.getInstance(BigIntegerWithoutKey.class);
     }
 }

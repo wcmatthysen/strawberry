@@ -1,6 +1,7 @@
 package org.strawberry.redis;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
@@ -72,10 +73,12 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
             value = 0L;
         } else if (type.equals(BigInteger.class)) {
             value = BigInteger.ZERO;
-        } else if (type.equals(double.class) || type.equals(Double.class)) {
-            value = 0.0;
         } else if (type.equals(float.class) || type.equals(Float.class)) {
             value = 0.0f;
+        } else if (type.equals(double.class) || type.equals(Double.class)) {
+            value = 0.0;
+        } else if (type.equals(BigDecimal.class)) {
+            value = BigDecimal.ZERO;
         } else if (type.equals(Map.class)) {
             value = Maps.newHashMap();
         } else if (type.equals(List.class)) {
@@ -257,8 +260,15 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         } else if (fieldType.equals(BigInteger.class)) {
                             String toConvert = jedis.get(redisKey);
                             try {
-                                // Remove thousand-separator (,) as BigInteger doesn't like this when parsing.
-                                value = new BigInteger(toConvert.replaceAll("\\,", ""));
+                                value = new BigInteger(toConvert);
+                            } catch (NumberFormatException e) {
+                                throw new NumberFormatException(String.format(
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                            }
+                        } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                            String toConvert = jedis.get(redisKey);
+                            try {
+                                value = Float.parseFloat(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
                                     "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
@@ -271,10 +281,10 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                                 throw new NumberFormatException(String.format(
                                     "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
                             }
-                        } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                        } else if (fieldType.equals(BigDecimal.class)) {
                             String toConvert = jedis.get(redisKey);
                             try {
-                                value = Float.parseFloat(toConvert);
+                                value = new BigDecimal(toConvert);
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
                                     "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
