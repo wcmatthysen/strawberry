@@ -1,6 +1,7 @@
 package org.strawberry.redis;
 
 import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,8 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
             value = 0;
         } else if (type.equals(long.class) || type.equals(Long.class)) {
             value = 0L;
+        } else if (type.equals(BigInteger.class)) {
+            value = BigInteger.ZERO;
         } else if (type.equals(double.class) || type.equals(Double.class)) {
             value = 0.0;
         } else if (type.equals(float.class) || type.equals(Float.class)) {
@@ -247,6 +250,15 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                             String toConvert = jedis.get(redisKey);
                             try {
                                 value = Long.parseLong(toConvert);
+                            } catch (NumberFormatException e) {
+                                throw new NumberFormatException(String.format(
+                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                            }
+                        } else if (fieldType.equals(BigInteger.class)) {
+                            String toConvert = jedis.get(redisKey);
+                            try {
+                                // Remove thousand-separator (,) as BigInteger doesn't like this when parsing.
+                                value = new BigInteger(toConvert.replaceAll("\\,", ""));
                             } catch (NumberFormatException e) {
                                 throw new NumberFormatException(String.format(
                                     "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
