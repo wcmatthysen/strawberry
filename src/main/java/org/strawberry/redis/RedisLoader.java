@@ -208,8 +208,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                             if (toConvert.length() == 1) {
                                 value = jedis.get(redisKey).charAt(0);
                             } else {
-                                throw new IllegalArgumentException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                throw ConversionException.of(toConvert, redisKey, fieldType);
                             }
                         } else if (fieldType.equals(String.class)) {
                             value = jedis.get(redisKey);
@@ -217,82 +216,40 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                             value = jedis.get(redisKey.getBytes());
                         } else if (fieldType.equals(Byte[].class)) {
                             value = ArrayUtils.toObject(jedis.get(redisKey.getBytes()));
-                        } else if (fieldType.equals(byte.class) || fieldType.equals(Byte.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                            value = Byte.parseByte(jedis.get(redisKey));
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
                         } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                             String toConvert = jedis.get(redisKey);
                             if (Patterns.BOOLEAN.matcher(toConvert).matches()) {
                                 value = Patterns.TRUE.matcher(toConvert).matches();
                             } else {
-                                throw new IllegalArgumentException(String.format(
-                                        "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = Short.parseShort(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = Integer.parseInt(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = Long.parseLong(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(BigInteger.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = new BigInteger(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = Float.parseFloat(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = Double.parseDouble(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
-                            }
-                        } else if (fieldType.equals(BigDecimal.class)) {
-                            String toConvert = jedis.get(redisKey);
-                            try {
-                                value = new BigDecimal(toConvert);
-                            } catch (NumberFormatException e) {
-                                throw new NumberFormatException(String.format(
-                                    "Cannot convert value: (%s) at key: (%s) to %s.", toConvert, redisKey, fieldType));
+                                throw ConversionException.of(toConvert, redisKey, fieldType);
                             }
                         } else if (fieldType.equals(Map.class)) {
                             value = jedis.hgetAll(redisKey);
                         } else if (fieldType.equals(List.class) || fieldType.equals(Set.class)) {
                             value = collectionOf(fieldType, jedis, redisKey, alwaysNest);
+                        } else {
+                            String toConvert = jedis.get(redisKey);
+                            try {
+                                if (fieldType.equals(byte.class) || fieldType.equals(Byte.class)) {
+                                    value = Byte.parseByte(jedis.get(redisKey));
+                                } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
+                                    value = Short.parseShort(toConvert);
+                                } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
+                                    value = Integer.parseInt(toConvert);
+                                } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
+                                    value = Long.parseLong(toConvert);
+                                } else if (fieldType.equals(BigInteger.class)) {
+                                    value = new BigInteger(toConvert);
+                                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                                    value = Float.parseFloat(toConvert);
+                                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
+                                    value = Double.parseDouble(toConvert);
+                                } else if (fieldType.equals(BigDecimal.class)) {
+                                    value = new BigDecimal(toConvert);
+                                }
+                            } catch (NumberFormatException exception) {
+                                throw ConversionException.of(exception, toConvert, redisKey, fieldType);
+                            }
                         }
                     } else if (redisKeys.size() > 1) {
                         if (fieldType.equals(List.class)) {
@@ -300,7 +257,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         }
                     } else {
                         if (!allowNull) {
-                           value = nonNullValueOf(fieldType);
+                            value = nonNullValueOf(fieldType);
                         }
                     }
                 }
