@@ -58,7 +58,7 @@ public class MapInjectionTest extends AbstractModule {
     
     public static class MapWithoutKey {
 
-        @Redis("test:map")
+        @Redis(value = "test:map", allowNull = false)
         private Map<String, String> injectedMap;
 
         public Map<String, String> getInjectedMap() {

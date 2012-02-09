@@ -26,7 +26,18 @@ final class RedisMembersInjector<T> implements MembersInjector<T> {
     public void injectMembers(final T object) {
         Option value = this.cache.getUnchecked(this.field);
         try {
-            this.field.set(object, value.toNull());
+            Redis annotation = this.field.getAnnotation(Redis.class);
+            if (this.field.get(object) != null) {
+                // If field is not equal to null (i.e. default value has been set)
+                // and if value to be injected is not null, then set.
+                // Or, if forced update has been specified, then set.
+                if (annotation.forceUpdate() || value.isSome()) {
+                    this.field.set(object, value.toNull());
+                }
+            } else {
+                // Always set null field.
+                this.field.set(object, value.toNull());
+            }
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

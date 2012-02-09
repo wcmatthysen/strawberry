@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.strawberry.guice.Redis;
-import org.strawberry.util.Patterns;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Iterables;
@@ -31,6 +31,10 @@ import static org.strawberry.util.JedisUtil.using;
  * @author Wiehann Matthysen
  */
 public final class RedisLoader extends CacheLoader<Field, Option> {
+    
+    private static final Pattern BOOLEAN = Pattern.compile("^t|true|y|yes|1|f|false|n|no|0$", Pattern.CASE_INSENSITIVE);
+    
+    private static final Pattern TRUE = Pattern.compile("^t|true|y|yes|1$", Pattern.CASE_INSENSITIVE);
 
     private enum JedisType {
         STRING, HASH, LIST, SET, ZSET
@@ -218,8 +222,8 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                             value = ArrayUtils.toObject(jedis.get(redisKey.getBytes()));
                         } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                             String toConvert = jedis.get(redisKey);
-                            if (Patterns.BOOLEAN.matcher(toConvert).matches()) {
-                                value = Patterns.TRUE.matcher(toConvert).matches();
+                            if (BOOLEAN.matcher(toConvert).matches()) {
+                                value = TRUE.matcher(toConvert).matches();
                             } else {
                                 throw ConversionException.of(toConvert, redisKey, fieldType);
                             }

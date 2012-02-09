@@ -56,8 +56,18 @@ public class StringInjectionTest extends AbstractModule {
 
     public static class StringWithoutKey {
 
-        @Redis("test:string")
+        @Redis(value = "test:string", allowNull = false)
         private String injectedString;
+
+        public String getInjectedString() {
+            return this.injectedString;
+        }
+    }
+    
+    public static class StringWithoutKeyDefaultValue {
+
+        @Redis(value = "test:string")
+        private String injectedString = "default_value";
 
         public String getInjectedString() {
             return this.injectedString;
@@ -147,6 +157,21 @@ public class StringInjectionTest extends AbstractModule {
         StringWithoutKeyAllowNull dummy = this.injector.getInstance(
             StringWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedString(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_string() {
+        // Test for case where no value is present in redis database.
+        StringWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            StringWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedString(), is(equalTo("default_value")));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        String expectedString = "test_value";
+        this.jedis.set("test:string", expectedString);
+        dummy = this.injector.getInstance(StringWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
     }
 
     @Test

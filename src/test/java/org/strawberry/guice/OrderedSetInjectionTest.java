@@ -1,5 +1,6 @@
 package org.strawberry.guice;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import redis.clients.jedis.JedisPool;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.strawberry.util.JedisUtil.destroyOnShutdown;
 
@@ -56,7 +58,7 @@ public class OrderedSetInjectionTest extends AbstractModule {
     
     public static class OrderedSetWithoutKey {
         
-        @Redis("test:zset")
+        @Redis(value = "test:zset", allowNull = false)
         private Set<String> injectedOrderedSet;
 
         public Set<String> getInjectedOrderedSet() {
@@ -100,6 +102,16 @@ public class OrderedSetInjectionTest extends AbstractModule {
         private Set<Set<String>> injectedSet;
 
         public Set<Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
+    public static class OrderedSetWithoutKeyAllowNull {
+
+        @Redis("test:zset")
+        private Set<String> injectedSet;
+
+        public Set<String> getInjectedSet() {
             return this.injectedSet;
         }
     }
@@ -163,5 +175,18 @@ public class OrderedSetInjectionTest extends AbstractModule {
         assertThat(actualSetSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(Iterables.getOnlyElement(actualSetSet));
         assertThat(actualList, is(equalTo(expectedList)));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_set() {
+        OrderedSetWithoutKeyAllowNull dummy = this.injector.getInstance(
+            OrderedSetWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedSet(), is(nullValue()));
+    }
+
+    @Test
+    public void test_that_missing_value_is_injected_as_empty_set_into_set() {
+        OrderedSetWithoutKey dummy = this.injector.getInstance(OrderedSetWithoutKey.class);
+        assertThat(dummy.getInjectedOrderedSet(), is(equalTo(Collections.EMPTY_SET)));
     }
 }

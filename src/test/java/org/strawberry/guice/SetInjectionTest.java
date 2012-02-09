@@ -58,7 +58,7 @@ public class SetInjectionTest extends AbstractModule {
 
     public static class SetWithoutKey {
 
-        @Redis("test:set")
+        @Redis(value = "test:set", allowNull = false)
         private Set<String> injectedSet;
 
         public Set<String> getInjectedSet() {
@@ -108,7 +108,7 @@ public class SetInjectionTest extends AbstractModule {
 
     public static class SetWithoutKeyAllowNull {
 
-        @Redis(value = "test:set", allowNull = true)
+        @Redis("test:set")
         private Set<String> injectedSet;
 
         public Set<String> getInjectedSet() {

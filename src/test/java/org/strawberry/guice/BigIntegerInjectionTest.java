@@ -52,7 +52,7 @@ public class BigIntegerInjectionTest extends AbstractModule {
 
     public static class BigIntegerWithoutKey {
 
-        @Redis("test:biginteger")
+        @Redis(value = "test:biginteger", allowNull = false)
         private BigInteger bigInteger;
 
         public BigInteger getInjectedBigInteger() {
@@ -62,9 +62,19 @@ public class BigIntegerInjectionTest extends AbstractModule {
 
     public static class BigIntegerWithoutKeyAllowNull {
 
-        @Redis(value = "test:biginteger", allowNull = true)
+        @Redis("test:biginteger")
         private BigInteger bigInteger;
 
+        public BigInteger getInjectedBigInteger() {
+            return this.bigInteger;
+        }
+    }
+    
+    public static class BigIntegerWithoutKeyDefaultValue {
+        
+        @Redis("test:biginteger")
+        private BigInteger bigInteger = BigInteger.TEN;
+        
         public BigInteger getInjectedBigInteger() {
             return this.bigInteger;
         }
@@ -91,6 +101,20 @@ public class BigIntegerInjectionTest extends AbstractModule {
     public void test_that_missing_value_is_injected_as_zero_into_biginteger() {
         BigIntegerWithoutKey dummy = this.injector.getInstance(BigIntegerWithoutKey.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(0));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_biginteger() {
+        // Test for case where no value is present in redis database.
+        BigIntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            BigIntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBigInteger().intValue(), is(10));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:biginteger", "123");
+        dummy = this.injector.getInstance(BigIntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBigInteger().intValue(), is(123));
     }
 
     @Test(expected = RuntimeException.class)

@@ -59,7 +59,7 @@ public class ListInjectionTest extends AbstractModule {
     
     public static class ListWithoutKey {
 
-        @Redis("test:list")
+        @Redis(value = "test:list", allowNull = false)
         private List<String> injectedList;
 
         public List<String> getInjectedList() {

@@ -25,5 +25,7 @@ public @interface Redis {
 
     boolean alwaysNest() default false;
 
-    boolean allowNull() default false;
+    boolean allowNull() default true;
+
+    boolean forceUpdate() default false;
 }

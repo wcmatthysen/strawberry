@@ -50,7 +50,7 @@ public class IntegerInjectionTest extends AbstractModule {
 
     public static class PrimitiveIntegerWithoutKey {
 
-        @Redis("test:integer")
+        @Redis(value = "test:integer", allowNull = false)
         private int injectedInteger;
 
         public int getInjectedInteger() {
@@ -60,8 +60,18 @@ public class IntegerInjectionTest extends AbstractModule {
 
     public static class PrimitiveIntegerWithoutKeyAllowNull {
 
-        @Redis(value = "test:integer", allowNull = true)
+        @Redis(value = "test:integer", forceUpdate = true)
         private int injectedInteger;
+
+        public int getInjectedInteger() {
+            return this.injectedInteger;
+        }
+    }
+    
+    public static class PrimitiveIntegerWithoutKeyDefaultValue {
+
+        @Redis(value = "test:integer")
+        private int injectedInteger = 123;
 
         public int getInjectedInteger() {
             return this.injectedInteger;
@@ -89,6 +99,20 @@ public class IntegerInjectionTest extends AbstractModule {
             PrimitiveIntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(0));
     }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_integer() {
+        // Test for case where no value is present in redis database.
+        PrimitiveIntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            PrimitiveIntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedInteger(), is(123));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:integer", "456");
+        dummy = this.injector.getInstance(PrimitiveIntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedInteger(), is(456));
+    }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_integer() {
@@ -112,7 +136,7 @@ public class IntegerInjectionTest extends AbstractModule {
 
     public static class IntegerWithoutKey {
 
-        @Redis("test:integer")
+        @Redis(value = "test:integer", allowNull = false)
         private Integer injectedInteger;
 
         public Integer getInjectedInteger() {
@@ -122,8 +146,18 @@ public class IntegerInjectionTest extends AbstractModule {
 
     public static class IntegerWithoutKeyAllowNull {
 
-        @Redis(value = "test:integer", allowNull = true)
+        @Redis("test:integer")
         private Integer injectedInteger;
+
+        public Integer getInjectedInteger() {
+            return this.injectedInteger;
+        }
+    }
+    
+    public static class IntegerWithoutKeyDefaultValue {
+
+        @Redis(value = "test:integer")
+        private Integer injectedInteger = 123;
 
         public Integer getInjectedInteger() {
             return this.injectedInteger;
@@ -151,6 +185,20 @@ public class IntegerInjectionTest extends AbstractModule {
     public void test_that_missing_value_is_injected_as_zero_into_integer() {
         IntegerWithoutKey dummy = this.injector.getInstance(IntegerWithoutKey.class);
         assertThat(dummy.getInjectedInteger(), is(0));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_integer() {
+        // Test for case where no value is present in redis database.
+        IntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            IntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedInteger(), is(123));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:integer", "456");
+        dummy = this.injector.getInstance(IntegerWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedInteger(), is(456));
     }
 
     @Test(expected = RuntimeException.class)

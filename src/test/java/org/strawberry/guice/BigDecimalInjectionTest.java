@@ -53,7 +53,7 @@ public class BigDecimalInjectionTest extends AbstractModule {
 
     public static class BigDecimalWithoutKey {
 
-        @Redis("test:bigdecimal")
+        @Redis(value = "test:bigdecimal", allowNull = false)
         private BigDecimal bigDecimal;
 
         public BigDecimal getInjectedBigDecimal() {
@@ -63,9 +63,19 @@ public class BigDecimalInjectionTest extends AbstractModule {
 
     public static class BigDecimalWithoutKeyAllowNull {
 
-        @Redis(value = "test:bigdecimal", allowNull = true)
+        @Redis("test:bigdecimal")
         private BigDecimal bigDecimal;
 
+        public BigDecimal getInjectedBigDecimal() {
+            return this.bigDecimal;
+        }
+    }
+    
+    public static class BigDecimalWithoutKeyDefaultValue {
+        
+        @Redis("test:bigdecimal")
+        private BigDecimal bigDecimal = BigDecimal.TEN;
+        
         public BigDecimal getInjectedBigDecimal() {
             return this.bigDecimal;
         }
@@ -92,6 +102,20 @@ public class BigDecimalInjectionTest extends AbstractModule {
     public void test_that_missing_value_is_injected_as_zero_into_bigdecimal() {
         BigDecimalWithoutKey dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(0.0));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_bigdecimal() {
+        // Test for case where no value is present in redis database.
+        BigDecimalWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            BigDecimalWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(10.0));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:bigdecimal", "1.23");
+        dummy = this.injector.getInstance(BigDecimalWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(1.23));
     }
 
     @Test(expected = RuntimeException.class)

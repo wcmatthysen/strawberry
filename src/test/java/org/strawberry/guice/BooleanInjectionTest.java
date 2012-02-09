@@ -21,12 +21,12 @@ import static org.strawberry.util.JedisUtil.destroyOnShutdown;
  * @author Wiehann Matthysen
  */
 public class BooleanInjectionTest extends AbstractModule {
-    
+
     private final JedisPool pool = destroyOnShutdown(new JedisPool("localhost", 6379));
-    
+
     private Injector injector;
     private Jedis jedis;
-    
+
     @Override
     protected void configure() {
         install(new RedisModule(this.pool));
@@ -45,22 +45,22 @@ public class BooleanInjectionTest extends AbstractModule {
         }
         this.pool.returnResource(this.jedis);
     }
-    
-    
-    
+
+
+
     public static class PrimitiveBooleanWithoutKey {
 
-        @Redis("test:boolean")
+        @Redis(value = "test:boolean", allowNull = false)
         private boolean injectedBoolean;
 
         public boolean getInjectedBoolean() {
             return this.injectedBoolean;
         }
     }
-    
+
     public static class PrimitiveBooleanWithoutKeyAllowNull {
 
-        @Redis(value = "test:boolean", allowNull = true)
+        @Redis(value = "test:boolean", forceUpdate = true)
         private boolean injectedBoolean;
 
         public boolean getInjectedBoolean() {
@@ -68,6 +68,16 @@ public class BooleanInjectionTest extends AbstractModule {
         }
     }
     
+    public static class PrimitiveBooleanWithoutKeyDefaultValue {
+        
+        @Redis("test:boolean")
+        private boolean injectedBoolean = true;
+        
+        public boolean getInjectedBoolean() {
+            return this.injectedBoolean;
+        }
+    }
+
     @Test
     public void test_that_string_without_key_is_converted_into_primitive_boolean() {
         this.jedis.set("test:boolean", "true");
@@ -84,12 +94,12 @@ public class BooleanInjectionTest extends AbstractModule {
         dummy = this.injector.getInstance(PrimitiveBooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_boolean_to_null() {
         this.injector.getInstance(PrimitiveBooleanWithoutKeyAllowNull.class);
     }
-    
+
     @Test
     public void test_that_missing_value_is_injected_as_false_into_primitive_boolean() {
         PrimitiveBooleanWithoutKey dummy = this.injector.getInstance(
@@ -97,15 +107,39 @@ public class BooleanInjectionTest extends AbstractModule {
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_boolean() {
+        // Test for case where no value is present in redis database.
+        PrimitiveBooleanWithoutKeyDefaultValue dummy = this.injector.getInstance(
+                PrimitiveBooleanWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBoolean(), is(true));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:boolean", "false");
+        dummy = this.injector.getInstance(PrimitiveBooleanWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBoolean(), is(false));
+    }
+
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_boolean() {
         this.jedis.set("test:boolean", "waar");
         this.injector.getInstance(PrimitiveBooleanWithoutKey.class);
     }
-    
-    
-    
+
+
+
     public static class BooleanWithoutKey {
+
+        @Redis(value = "test:boolean", allowNull = false)
+        private Boolean injectedBoolean;
+
+        public Boolean getInjectedBoolean() {
+            return this.injectedBoolean;
+        }
+    }
+
+    public static class BooleanWithoutKeyAllowNull {
 
         @Redis("test:boolean")
         private Boolean injectedBoolean;
@@ -115,16 +149,16 @@ public class BooleanInjectionTest extends AbstractModule {
         }
     }
     
-    public static class BooleanWithoutKeyAllowNull {
-
-        @Redis(value = "test:boolean", allowNull = true)
-        private Boolean injectedBoolean;
-
+    public static class BooleanWithoutKeyDefaultValue {
+        
+        @Redis("test:boolean")
+        private Boolean injectedBoolean = Boolean.TRUE;
+        
         public Boolean getInjectedBoolean() {
             return this.injectedBoolean;
         }
     }
-    
+
     @Test
     public void test_that_string_without_key_is_converted_into_boolean() {
         this.jedis.set("test:boolean", "y");
@@ -140,20 +174,34 @@ public class BooleanInjectionTest extends AbstractModule {
         dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
-    
+
     @Test
     public void test_that_missing_value_is_injected_as_null_into_boolean() {
         BooleanWithoutKeyAllowNull dummy = this.injector.getInstance(
             BooleanWithoutKeyAllowNull.class);
         assertThat(dummy.getInjectedBoolean(), is(nullValue()));
     }
-    
+
     @Test
     public void test_that_missing_value_is_injected_as_false_into_boolean() {
         BooleanWithoutKey dummy = this.injector.getInstance(BooleanWithoutKey.class);
         assertThat(dummy.getInjectedBoolean(), is(false));
     }
     
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_boolean() {
+        // Test for case where no value is present in redis database.
+        BooleanWithoutKeyDefaultValue dummy = this.injector.getInstance(
+                BooleanWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBoolean(), is(true));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:boolean", "false");
+        dummy = this.injector.getInstance(BooleanWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedBoolean(), is(false));
+    }
+
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_boolean() {
         this.jedis.set("test:boolean", "vals");

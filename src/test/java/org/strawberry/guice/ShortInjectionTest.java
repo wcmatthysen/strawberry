@@ -50,7 +50,7 @@ public class ShortInjectionTest extends AbstractModule {
 
     public static class PrimitiveShortWithoutKey {
 
-        @Redis("test:short")
+        @Redis(value = "test:short", allowNull = false)
         private short injectedShort;
 
         public short getInjectedShort() {
@@ -60,8 +60,18 @@ public class ShortInjectionTest extends AbstractModule {
 
     public static class PrimitiveShortWithoutKeyAllowNull {
 
-        @Redis(value = "test:short", allowNull = true)
+        @Redis(value = "test:short", forceUpdate = true)
         private short injectedShort;
+
+        public short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+    
+    public static class PrimitiveShortWithoutKeyDefaultValue {
+
+        @Redis(value = "test:short")
+        private short injectedShort = 123;
 
         public short getInjectedShort() {
             return this.injectedShort;
@@ -89,6 +99,20 @@ public class ShortInjectionTest extends AbstractModule {
             PrimitiveShortWithoutKey.class);
         assertThat(dummy.getInjectedShort(), is((short)0));
     }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_short() {
+        // Test for case where no value is present in redis database.
+        PrimitiveShortWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            PrimitiveShortWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedShort(), is((short)123));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:short", "456");
+        dummy = this.injector.getInstance(PrimitiveShortWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedShort(), is((short)456));
+    }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_short() {
@@ -112,7 +136,7 @@ public class ShortInjectionTest extends AbstractModule {
 
     public static class ShortWithoutKey {
 
-        @Redis("test:short")
+        @Redis(value = "test:short", allowNull = false)
         private Short injectedShort;
 
         public Short getInjectedShort() {
@@ -122,8 +146,18 @@ public class ShortInjectionTest extends AbstractModule {
 
     public static class ShortWithoutKeyAllowNull {
 
-        @Redis(value = "test:short", allowNull = true)
+        @Redis("test:short")
         private Short injectedShort;
+
+        public Short getInjectedShort() {
+            return this.injectedShort;
+        }
+    }
+    
+    public static class ShortWithoutKeyDefaultValue {
+
+        @Redis(value = "test:short")
+        private Short injectedShort = 123;
 
         public Short getInjectedShort() {
             return this.injectedShort;
@@ -151,6 +185,20 @@ public class ShortInjectionTest extends AbstractModule {
     public void test_that_missing_value_is_injected_as_zero_into_short() {
         ShortWithoutKey dummy = this.injector.getInstance(ShortWithoutKey.class);
         assertThat(dummy.getInjectedShort(), is((short)0));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_short() {
+        // Test for case where no value is present in redis database.
+        ShortWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            ShortWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedShort(), is((short)123));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        this.jedis.set("test:short", "456");
+        dummy = this.injector.getInstance(ShortWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedShort(), is((short)456));
     }
 
     @Test(expected = RuntimeException.class)
