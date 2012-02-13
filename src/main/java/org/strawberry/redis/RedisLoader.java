@@ -197,8 +197,15 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
 
                 Set<String> redisKeys = jedis.keys(pattern);
                 if (includeKeys) {
-                    if (fieldType.equals(Map.class)) {
-                        value = nestedMapOf(jedis, redisKeys);
+                    if (redisKeys.size() >= 1) {
+                        if (fieldType.equals(Map.class)) {
+                            value = nestedMapOf(jedis, redisKeys);
+                        }
+                    }
+                    else {
+                        if (!allowNull) {
+                            value = nonNullValueOf(fieldType);
+                        }
                     }
                 } else {
                     if (redisKeys.size() == 1) {
