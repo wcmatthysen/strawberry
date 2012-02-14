@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -67,51 +68,23 @@ public class ListInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ListAsSetWithoutKey {
-        
-        @Redis("test:list")
-        private Set<String> injectedSet;
-        
-        public Set<String> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-    
-    public static class ListWithKey {
-
-        @Redis(value = "test:list", includeKeys = true)
-        private Map<String, List<String>> injectedList;
-
-        public Map<String, List<String>> getInjectedList() {
-            return this.injectedList;
-        }
-    }
-
-    public static class ListInListWithoutKey {
-
-        @Redis(value = "test:list", alwaysNest = true)
-        private List<List<String>> injectedList;
-
-        public List<List<String>> getInjectedList() {
-            return this.injectedList;
-        }
-    }
-    
-    public static class ListInSetWithoutKey {
-        
-        @Redis(value = "test:list", alwaysNest = true)
-        private Set<List<String>> injectedList;
-        
-        public Set<List<String>> getInjectedList() {
-            return this.injectedList;
-        }
-    }
-
     public static class ListWithoutKeyAllowNull {
 
         @Redis(value = "test:list", allowNull = true)
         private List<String> injectedList;
 
+        public List<String> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+    
+    public static class ListWithoutKeyDefaultValue {
+        
+        @Redis(value = "test:list")
+        private List<String> injectedList = ImmutableList.of(
+            "def_value_01", "def_value_02", "def_value_03"
+        );
+        
         public List<String> getInjectedList() {
             return this.injectedList;
         }
@@ -128,6 +101,49 @@ public class ListInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_missing_value_is_injected_as_null_into_list() {
+        ListWithoutKeyAllowNull dummy = this.injector.getInstance(
+            ListWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedList(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_empty_list_into_list() {
+        ListWithoutKey dummy = this.injector.getInstance(ListWithoutKey.class);
+        assertThat(dummy.getInjectedList(), is(equalTo(Collections.EMPTY_LIST)));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_list() {
+        // Test for case where no value is present in redis database.
+        ListWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            ListWithoutKeyDefaultValue.class);
+        List<String> defaultList = ImmutableList.of("def_value_01", "def_value_02", "def_value_03");
+        assertThat(dummy.getInjectedList(), is(equalTo(defaultList)));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
+        for (String value : expectedList) {
+            this.jedis.rpush("test:list", value);
+        }
+        dummy = this.injector.getInstance(ListWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedList(), is(equalTo(expectedList)));
+    }
+    
+    
+    
+    public static class ListAsSetWithoutKey {
+        
+        @Redis("test:list")
+        private Set<String> injectedSet;
+        
+        public Set<String> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
+    @Test
     public void test_that_list_without_key_is_injected_into_set() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
         for (String value : expectedList) {
@@ -136,6 +152,18 @@ public class ListInjectionTest extends AbstractModule {
         ListAsSetWithoutKey dummy = this.injector.getInstance(ListAsSetWithoutKey.class);
         Set<String> actualSet = dummy.getInjectedSet();
         assertThat(actualSet, is(equalTo((Set)Sets.newHashSet(expectedList))));
+    }
+    
+    
+    
+    public static class ListWithKey {
+
+        @Redis(value = "test:list", includeKeys = true)
+        private Map<String, List<String>> injectedList;
+
+        public Map<String, List<String>> getInjectedList() {
+            return this.injectedList;
+        }
     }
     
     @Test
@@ -150,6 +178,18 @@ public class ListInjectionTest extends AbstractModule {
         assertThat(actualMapList.get("test:list"), is(equalTo(expectedList)));
     }
     
+    
+    
+    public static class ListInListWithoutKey {
+
+        @Redis(value = "test:list", alwaysNest = true)
+        private List<List<String>> injectedList;
+
+        public List<List<String>> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+    
     @Test
     public void test_that_list_without_key_is_injected_into_list_of_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
@@ -162,6 +202,18 @@ public class ListInjectionTest extends AbstractModule {
         assertThat(actualListList.get(0), is(equalTo(expectedList)));
     }
     
+    
+    
+    public static class ListInSetWithoutKey {
+        
+        @Redis(value = "test:list", alwaysNest = true)
+        private Set<List<String>> injectedList;
+        
+        public Set<List<String>> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+    
     @Test
     public void test_that_list_without_key_is_injected_into_set_of_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
@@ -172,18 +224,5 @@ public class ListInjectionTest extends AbstractModule {
         Set<List<String>> actualSetList = dummy.getInjectedList();
         assertThat(actualSetList.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualSetList), is(equalTo(expectedList)));
-    }
-    
-    @Test
-    public void test_that_missing_value_is_injected_as_null_into_list() {
-        ListWithoutKeyAllowNull dummy = this.injector.getInstance(
-            ListWithoutKeyAllowNull.class);
-        assertThat(dummy.getInjectedList(), is(nullValue()));
-    }
-    
-    @Test
-    public void test_that_missing_value_is_injected_as_empty_list_into_list() {
-        ListWithoutKey dummy = this.injector.getInstance(ListWithoutKey.class);
-        assertThat(dummy.getInjectedList(), is(equalTo(Collections.EMPTY_LIST)));
     }
 }
