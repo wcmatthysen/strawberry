@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -66,53 +67,25 @@ public class OrderedSetInjectionTest extends AbstractModule {
         }
     }
     
-    public static class OrderedSetAsListWithoutKey {
-        
-        @Redis("test:zset")
-        private List<String> injectedList;
-        
-        public List<String> getInjectedList() {
-            return this.injectedList;
-        }
-    }
-    
-    public static class OrderedSetWithKey {
-
-        @Redis(value = "test:zset", includeKeys = true)
-        private Map<String, Set<String>> injectedSet;
-
-        public Map<String, Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-    
-    public static class OrderedSetInListWithoutKey {
-        
-        @Redis(value = "test:zset", alwaysNest = true)
-        private List<Set<String>> injectedSet;
-        
-        public List<Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-    
-    public static class OrderedSetInSetWithoutKey {
-
-        @Redis(value = "test:zset", alwaysNest = true)
-        private Set<Set<String>> injectedSet;
-
-        public Set<Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-    
     public static class OrderedSetWithoutKeyAllowNull {
 
         @Redis("test:zset")
-        private Set<String> injectedSet;
+        private Set<String> injectedOrderedSet;
 
-        public Set<String> getInjectedSet() {
-            return this.injectedSet;
+        public Set<String> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
+        }
+    }
+    
+    public static class OrderedSetWithoutKeyDefaultValue {
+        
+        @Redis("test:zset")
+        private Set<String> injectedOrderedSet = Sets.newLinkedHashSet(
+            Lists.newArrayList("def_value_03", "def_value_02", "def_value_01")
+        );
+        
+        public Set<String> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
         }
     }
     
@@ -128,6 +101,52 @@ public class OrderedSetInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_missing_value_is_injected_as_null_into_set() {
+        OrderedSetWithoutKeyAllowNull dummy = this.injector.getInstance(
+            OrderedSetWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedOrderedSet(), is(nullValue()));
+    }
+
+    @Test
+    public void test_that_missing_value_is_injected_as_empty_set_into_set() {
+        OrderedSetWithoutKey dummy = this.injector.getInstance(OrderedSetWithoutKey.class);
+        assertThat(dummy.getInjectedOrderedSet(), is(equalTo(Collections.EMPTY_SET)));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_set() {
+        // Test for case where no value is present in redis database.
+        OrderedSetWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            OrderedSetWithoutKeyDefaultValue.class);
+        Set<String> defaultSet = Sets.newLinkedHashSet(
+            Lists.newArrayList("def_value_03", "def_value_02", "def_value_01")
+        );
+        assertThat(dummy.getInjectedOrderedSet(), is(equalTo(defaultSet)));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
+        for (int i = 0; i < expectedList.size(); ++i) {
+            this.jedis.zadd("test:zset", i, expectedList.get(i));
+        }
+        dummy = this.injector.getInstance(OrderedSetWithoutKeyDefaultValue.class);
+        List<String> actualList = Lists.newArrayList(dummy.getInjectedOrderedSet());
+        assertThat(actualList, is(equalTo(expectedList)));
+    }
+    
+    
+    
+    public static class OrderedSetAsListWithoutKey {
+        
+        @Redis("test:zset")
+        private List<String> injectedList;
+        
+        public List<String> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+    
+    @Test
     public void test_that_ordered_set_without_key_is_injected_into_list() {
         List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
         for (int i = 0; i < expectedList.size(); ++i) {
@@ -138,6 +157,18 @@ public class OrderedSetInjectionTest extends AbstractModule {
         assertThat(actualList, is(equalTo(expectedList)));
     }
     
+    
+    
+    public static class OrderedSetWithKey {
+
+        @Redis(value = "test:zset", includeKeys = true)
+        private Map<String, Set<String>> injectedOrderedSet;
+
+        public Map<String, Set<String>> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
+        }
+    }
+    
     @Test
     public void test_that_ordered_set_with_key_is_injected_into_map_of_set() {
         List<String> expectedList = Lists.newArrayList("value_03", "value_02", "value_01");
@@ -145,10 +176,22 @@ public class OrderedSetInjectionTest extends AbstractModule {
             this.jedis.zadd("test:zset", i, expectedList.get(i));
         }
         OrderedSetWithKey dummy = this.injector.getInstance(OrderedSetWithKey.class);
-        Map<String, Set<String>> actualMapSet = dummy.getInjectedSet();
+        Map<String, Set<String>> actualMapSet = dummy.getInjectedOrderedSet();
         assertThat(actualMapSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(actualMapSet.get("test:zset"));
         assertThat(actualList, is(equalTo(expectedList)));
+    }
+    
+    
+    
+    public static class OrderedSetInListWithoutKey {
+        
+        @Redis(value = "test:zset", alwaysNest = true)
+        private List<Set<String>> injectedOrderedSet;
+        
+        public List<Set<String>> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
+        }
     }
     
     @Test
@@ -158,10 +201,22 @@ public class OrderedSetInjectionTest extends AbstractModule {
             this.jedis.zadd("test:zset", i, expectedList.get(i));
         }
         OrderedSetInListWithoutKey dummy = this.injector.getInstance(OrderedSetInListWithoutKey.class);
-        List<Set<String>> actualListSet = dummy.getInjectedSet();
+        List<Set<String>> actualListSet = dummy.getInjectedOrderedSet();
         assertThat(actualListSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(actualListSet.get(0));
         assertThat(actualList, is(equalTo(expectedList)));
+    }
+    
+    
+    
+    public static class OrderedSetInSetWithoutKey {
+
+        @Redis(value = "test:zset", alwaysNest = true)
+        private Set<Set<String>> injectedOrderedSet;
+
+        public Set<Set<String>> getInjectedOrderedSet() {
+            return this.injectedOrderedSet;
+        }
     }
     
     @Test
@@ -171,22 +226,9 @@ public class OrderedSetInjectionTest extends AbstractModule {
             this.jedis.zadd("test:zset", i, expectedList.get(i));
         }
         OrderedSetInSetWithoutKey dummy = this.injector.getInstance(OrderedSetInSetWithoutKey.class);
-        Set<Set<String>> actualSetSet = dummy.getInjectedSet();
+        Set<Set<String>> actualSetSet = dummy.getInjectedOrderedSet();
         assertThat(actualSetSet.size(), is(1));
         List<String> actualList = Lists.newArrayList(Iterables.getOnlyElement(actualSetSet));
         assertThat(actualList, is(equalTo(expectedList)));
-    }
-    
-    @Test
-    public void test_that_missing_value_is_injected_as_null_into_set() {
-        OrderedSetWithoutKeyAllowNull dummy = this.injector.getInstance(
-            OrderedSetWithoutKeyAllowNull.class);
-        assertThat(dummy.getInjectedSet(), is(nullValue()));
-    }
-
-    @Test
-    public void test_that_missing_value_is_injected_as_empty_set_into_set() {
-        OrderedSetWithoutKey dummy = this.injector.getInstance(OrderedSetWithoutKey.class);
-        assertThat(dummy.getInjectedOrderedSet(), is(equalTo(Collections.EMPTY_SET)));
     }
 }
