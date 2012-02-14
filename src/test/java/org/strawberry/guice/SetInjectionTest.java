@@ -65,52 +65,24 @@ public class SetInjectionTest extends AbstractModule {
             return this.injectedSet;
         }
     }
-
-    public static class SetAsListWithoutKey {
-
-        @Redis("test:set")
-        private List<String> injectedList;
-
-        public List<String> getInjectedList() {
-            return this.injectedList;
-        }
-    }
-
-    public static class SetWithKey {
-
-        @Redis(value = "test:set", includeKeys = true)
-        private Map<String, Set<String>> injectedSet;
-
-        public Map<String, Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-
-    public static class SetInListWithoutKey {
-
-        @Redis(value = "test:set", alwaysNest = true)
-        private List<Set<String>> injectedSet;
-
-        public List<Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-
-    public static class SetInSetWithoutKey {
-
-        @Redis(value = "test:set", alwaysNest = true)
-        private Set<Set<String>> injectedSet;
-
-        public Set<Set<String>> getInjectedSet() {
-            return this.injectedSet;
-        }
-    }
-
+    
     public static class SetWithoutKeyAllowNull {
 
         @Redis("test:set")
         private Set<String> injectedSet;
 
+        public Set<String> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
+    
+    public static class SetWithoutKeyDefaultValue {
+        
+        @Redis("test:set")
+        private Set<String> injectedSet = Sets.newHashSet(
+            "def_value_01", "def_value_02", "def_value_03"
+        );
+        
         public Set<String> getInjectedSet() {
             return this.injectedSet;
         }
@@ -125,6 +97,52 @@ public class SetInjectionTest extends AbstractModule {
         SetWithoutKey dummy = this.injector.getInstance(SetWithoutKey.class);
         assertThat(dummy.getInjectedSet(), is(equalTo(expectedSet)));
     }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_set() {
+        SetWithoutKeyAllowNull dummy = this.injector.getInstance(
+            SetWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedSet(), is(nullValue()));
+    }
+
+    @Test
+    public void test_that_missing_value_is_injected_as_empty_set_into_set() {
+        SetWithoutKey dummy = this.injector.getInstance(SetWithoutKey.class);
+        assertThat(dummy.getInjectedSet(), is(equalTo(Collections.EMPTY_SET)));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_set() {
+        // Test for case where no value is present in redis database.
+        SetWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            SetWithoutKeyDefaultValue.class);
+        Set<String> defaultSet = Sets.newHashSet(
+            "def_value_01", "def_value_02", "def_value_03"
+        );
+        assertThat(dummy.getInjectedSet(), is(equalTo(defaultSet)));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        Set<String> expectedSet = Sets.newHashSet("value_01", "value_02", "value_03");
+        for (String value : expectedSet) {
+            this.jedis.sadd("test:set", value);
+        }
+        dummy = this.injector.getInstance(SetWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedSet(), is(equalTo(expectedSet)));
+    }
+    
+    
+    
+    public static class SetAsListWithoutKey {
+
+        @Redis("test:set")
+        private List<String> injectedList;
+
+        public List<String> getInjectedList() {
+            return this.injectedList;
+        }
+    }
+
 
     @Test
     public void test_that_set_without_key_is_injected_into_list() {
@@ -135,6 +153,18 @@ public class SetInjectionTest extends AbstractModule {
         SetAsListWithoutKey dummy = this.injector.getInstance(SetAsListWithoutKey.class);
         Set<String> actualSet = Sets.newHashSet(dummy.getInjectedList());
         assertThat(actualSet, is(equalTo(expectedSet)));
+    }
+    
+    
+    
+    public static class SetWithKey {
+
+        @Redis(value = "test:set", includeKeys = true)
+        private Map<String, Set<String>> injectedSet;
+
+        public Map<String, Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
     }
 
     @Test
@@ -148,6 +178,18 @@ public class SetInjectionTest extends AbstractModule {
         assertThat(actualMapSet.size(), is(1));
         assertThat(actualMapSet.get("test:set"), is(equalTo(expectedSet)));
     }
+    
+    
+    
+    public static class SetInListWithoutKey {
+
+        @Redis(value = "test:set", alwaysNest = true)
+        private List<Set<String>> injectedSet;
+
+        public List<Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
 
     @Test
     public void test_that_set_without_key_is_injected_into_list_of_set() {
@@ -160,6 +202,18 @@ public class SetInjectionTest extends AbstractModule {
         assertThat(actualListSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualListSet), is(equalTo(expectedSet)));
     }
+    
+    
+    
+    public static class SetInSetWithoutKey {
+
+        @Redis(value = "test:set", alwaysNest = true)
+        private Set<Set<String>> injectedSet;
+
+        public Set<Set<String>> getInjectedSet() {
+            return this.injectedSet;
+        }
+    }
 
     @Test
     public void test_that_set_without_key_is_injected_into_set_of_set() {
@@ -171,18 +225,5 @@ public class SetInjectionTest extends AbstractModule {
         Set<Set<String>> actualSetSet = dummy.getInjectedSet();
         assertThat(actualSetSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualSetSet), is(equalTo(expectedSet)));
-    }
-
-    @Test
-    public void test_that_missing_value_is_injected_as_null_into_set() {
-        SetWithoutKeyAllowNull dummy = this.injector.getInstance(
-            SetWithoutKeyAllowNull.class);
-        assertThat(dummy.getInjectedSet(), is(nullValue()));
-    }
-
-    @Test
-    public void test_that_missing_value_is_injected_as_empty_set_into_set() {
-        SetWithoutKey dummy = this.injector.getInstance(SetWithoutKey.class);
-        assertThat(dummy.getInjectedSet(), is(equalTo(Collections.EMPTY_SET)));
     }
 }
