@@ -65,42 +65,26 @@ public class MapInjectionTest extends AbstractModule {
             return this.injectedMap;
         }
     }
-
-    public static class MapWithKey {
-
-        @Redis(value = "test:map", includeKeys = true)
-        private Map<String, Map<String, String>> injectedMap;
-
-        public Map<String, Map<String, String>> getInjectedMap() {
-            return this.injectedMap;
-        }
-    }
-
-    public static class MapInListWithoutKey {
-
-        @Redis("test:map")
-        private List<Map<String, String>> injectedMap;
-
-        public List<Map<String, String>> getInjectedMap() {
-            return this.injectedMap;
-        }
-    }
     
-    public static class MapInSetWithoutKey {
-        
-        @Redis("test:map")
-        private Set<Map<String, String>> injectedMap;
-        
-        public Set<Map<String, String>> getInjectedMap() {
-            return this.injectedMap;
-        }
-    }
-
     public static class MapWithoutKeyAllowNull {
 
         @Redis(value = "test:map", allowNull = true)
         private Map<String, String> injectedMap;
 
+        public Map<String, String> getInjectedMap() {
+            return this.injectedMap;
+        }
+    }
+    
+    public static class MapWithoutKeyDefaultValue {
+        
+        @Redis(value = "test:map")
+        private Map<String, String> injectedMap = ImmutableMap.of(
+            "def_key_01", "def_value_01",
+            "def_key_02", "def_value_02",
+            "def_key_03", "def_value_03"
+        );
+        
         public Map<String, String> getInjectedMap() {
             return this.injectedMap;
         }
@@ -119,6 +103,55 @@ public class MapInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_missing_value_is_injected_as_null_into_map() {
+        MapWithoutKeyAllowNull dummy = this.injector.getInstance(
+            MapWithoutKeyAllowNull.class);
+        assertThat(dummy.getInjectedMap(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_empty_map_into_map() {
+        MapWithoutKey dummy = this.injector.getInstance(MapWithoutKey.class);
+        assertThat(dummy.getInjectedMap(), is(equalTo(Collections.EMPTY_MAP)));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_map() {
+        // Test for case where no value is present in redis database.
+        MapWithoutKeyDefaultValue dummy = this.injector.getInstance(
+            MapWithoutKeyDefaultValue.class);
+        Map<String, String> defaultMap = ImmutableMap.of(
+            "def_key_01", "def_value_01",
+            "def_key_02", "def_value_02",
+            "def_key_03", "def_value_03"
+        );
+        assertThat(dummy.getInjectedMap(), is(equalTo(defaultMap)));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        Map<String, String> expectedMap = ImmutableMap.of(
+            "key_01", "value_01",
+            "key_02", "value_02",
+            "key_03", "value_03"
+        );
+        this.jedis.hmset("test:map", expectedMap);
+        dummy = this.injector.getInstance(MapWithoutKeyDefaultValue.class);
+        assertThat(dummy.getInjectedMap(), is(equalTo(expectedMap)));
+    }
+    
+    
+    
+    public static class MapWithKey {
+
+        @Redis(value = "test:map", includeKeys = true)
+        private Map<String, Map<String, String>> injectedMap;
+
+        public Map<String, Map<String, String>> getInjectedMap() {
+            return this.injectedMap;
+        }
+    }
+    
+    @Test
     public void test_that_map_with_key_is_injected_into_map_of_map() {
         Map<String, String> expectedMap = ImmutableMap.of(
             "key_01", "value_01",
@@ -130,6 +163,18 @@ public class MapInjectionTest extends AbstractModule {
         Map<String, Map<String, String>> actualMapMap = dummy.getInjectedMap();
         assertThat(actualMapMap.size(), is(1));
         assertThat(actualMapMap.get("test:map"), is(equalTo(expectedMap)));
+    }
+    
+    
+    
+    public static class MapInListWithoutKey {
+
+        @Redis("test:map")
+        private List<Map<String, String>> injectedMap;
+
+        public List<Map<String, String>> getInjectedMap() {
+            return this.injectedMap;
+        }
     }
     
     @Test
@@ -146,6 +191,18 @@ public class MapInjectionTest extends AbstractModule {
         assertThat(actualMapList.get(0), is(equalTo(expectedMap)));
     }
     
+    
+    
+    public static class MapInSetWithoutKey {
+        
+        @Redis("test:map")
+        private Set<Map<String, String>> injectedMap;
+        
+        public Set<Map<String, String>> getInjectedMap() {
+            return this.injectedMap;
+        }
+    }
+    
     @Test
     public void test_that_map_without_key_is_injected_into_set_of_map() {
         Map<String, String> expectedMap = ImmutableMap.of(
@@ -158,18 +215,5 @@ public class MapInjectionTest extends AbstractModule {
         Set<Map<String, String>> actualMapSet = dummy.getInjectedMap();
         assertThat(actualMapSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualMapSet), is(equalTo(expectedMap)));
-    }
-    
-    @Test
-    public void test_that_missing_value_is_injected_as_null_into_map() {
-        MapWithoutKeyAllowNull dummy = this.injector.getInstance(
-            MapWithoutKeyAllowNull.class);
-        assertThat(dummy.getInjectedMap(), is(nullValue()));
-    }
-    
-    @Test
-    public void test_that_missing_value_is_injected_as_empty_map_into_map() {
-        MapWithoutKey dummy = this.injector.getInstance(MapWithoutKey.class);
-        assertThat(dummy.getInjectedMap(), is(equalTo(Collections.EMPTY_MAP)));
     }
 }
