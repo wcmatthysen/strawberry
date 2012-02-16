@@ -36,6 +36,9 @@
                         <exclude>target/**</exclude>
                     </excludes>
                     <useDefaultExcludes>true</useDefaultExcludes>
+                    <properties>
+                        <year>2012</year>
+                    </properties>
                     <mapping>
                         <grammar>JAVADOC_STYLE</grammar>
                     </mapping>
