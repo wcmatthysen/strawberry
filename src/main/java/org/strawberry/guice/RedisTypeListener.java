@@ -19,7 +19,7 @@ package org.strawberry.guice;
 
 import java.lang.reflect.Field;
 
-import com.google.common.cache.Cache;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
@@ -32,9 +32,9 @@ import fj.data.Option;
  */
 final class RedisTypeListener implements TypeListener {
 
-    private final Cache<Field, Option> cache;
+    private final LoadingCache<Field, Option> cache;
 
-    RedisTypeListener(Cache<Field, Option> cache) {
+    RedisTypeListener(LoadingCache<Field, Option> cache) {
         this.cache = cache;
     }
 

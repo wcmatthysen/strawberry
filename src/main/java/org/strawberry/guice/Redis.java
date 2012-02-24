@@ -42,8 +42,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Redis {
 
     /**
-     * The key-pattern to use when querying the Redis database for values
-     * to be injected into this field.
+     * The key-pattern to use when querying the Redis database for values to be
+     * injected into this field.
      */
     String value();
 
@@ -56,26 +56,27 @@ public @interface Redis {
 
     /**
      * If true and given the key-pattern, the matching value(s) from the Redis
-     * database will be nested inside a collection before being injected
-     * into the annotated field.
+     * database will be nested inside a collection before being injected into
+     * the annotated field.
      * Otherwise, if false, values will be injected as-is, and will only be
      * converted if and when it makes sense.
      */
     boolean alwaysNest() default false;
 
     /**
-     * If false, a default value will be injected for the specified type if
-     * no matching value for the specified key-pattern exists in the Redis
+     * If false, a default value will be injected for the specified type if no
+     * matching value for the specified key-pattern exists in the Redis
      * database. This default value is type dependent and only the following
-     * type are supported: char([]) and Character([]), String, byte([]) and
-     * Byte([], boolean and Boolean, short and Short, int and Integer, long
-     * and Long, BigInteger, float and Float, double and Double, BigDecimal,
-     * Map, List and Set.
+     * type are supported: {@code char([])} and {@code Character([])},
+     * {@code String}, {@code byte([])} and {@code Byte([]}, {@code boolean} and
+     * {@code Boolean}, {@code short} and {@code Short}, {@code int} and
+     * {@code Integer}, {@code long} and {@cod Long}, {@code BigInteger},
+     * {@code float} and {@code Float}, {@code double} and {@code Double},
+     * {@code BigDecimal}, {@code Map}, {@code List} and {@code Set}.
      * Otherwise, if true, null will be used as the candidate-value if no
      * matching value for the specified key-pattern exists in the Redis
      * database. However, if {@link Redis#forceUpdate()} is false, then a
-     * non-null default field-value will take precedence over a null
-     * candidate.
+     * non-null default field-value will take precedence over a null candidate.
      */
     boolean allowNull() default true;
 

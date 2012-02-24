@@ -29,11 +29,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.strawberry.guice.Redis;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.Injector;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -44,7 +47,11 @@ import fj.data.Option;
 import static org.strawberry.util.JedisUtil.using;
 
 /**
- *
+ * {@code RedisLoader} is used in conjunction with a {@link CacheBuilder} to
+ * construct a {@link Cache} of {@link Field} values. An {@link Injector} uses
+ * these field values during the object-creation phase when setting values for
+ * fields that have been annotated with the {@link Redis}-annotation.
+ * 
  * @author Wiehann Matthysen
  */
 public final class RedisLoader extends CacheLoader<Field, Option> {
@@ -53,12 +60,21 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
     
     private static final Pattern TRUE = Pattern.compile("^t|true|y|yes|1$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Internal enum to match against all supported Redis data types.
+     */
     private enum JedisType {
         STRING, HASH, LIST, SET, ZSET
     }
 
     private final JedisPool pool;
 
+    /**
+     * Initializes a newly created {@code RedisLoader} with the given
+     * {@link JedisPool} to be used as source for connections to a Redis
+     * database.
+     * @param pool The pool of connections to a Redis database.
+     */
     public RedisLoader(JedisPool pool) {
         this.pool = pool;
     }
@@ -68,6 +84,15 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         return loadFromRedis(this.pool, field.getType(), field.getAnnotation(Redis.class));
     }
 
+    /**
+     * Utility method to create a default non-null value for the given type
+     * parameter. This gets called when {@link Redis#allowNull()} was set to
+     * false for the given {@link Field}, and no value for the specified key(s)
+     * (see {@link Redis#value()}) was present in the Redis database.
+     * @param type The type to create the non-null value for.
+     * @return A non-null instance of the type. Note: for primitives this will
+     * obviously result in a boxed return value.
+     */
     private static Object nonNullValueOf(Class<?> type) {
         Object value = null;
         if (type.equals(char[].class)) {
@@ -101,11 +126,11 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         } else if (type.equals(BigDecimal.class)) {
             value = BigDecimal.ZERO;
         } else if (type.equals(Map.class)) {
-            value = Maps.newHashMap();
+            value = Maps.newLinkedHashMap();
         } else if (type.equals(List.class)) {
             value = Lists.newArrayList();
         } else if (type.equals(Set.class)) {
-            value = Sets.newHashSet();
+            value = Sets.newLinkedHashSet();
         }
         return value;
     }

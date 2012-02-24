@@ -19,7 +19,7 @@ package org.strawberry.guice;
 
 import java.lang.reflect.Field;
 
-import com.google.common.cache.Cache;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.MembersInjector;
 
 import fj.data.Option;
@@ -30,10 +30,10 @@ import fj.data.Option;
  */
 final class RedisMembersInjector<T> implements MembersInjector<T> {
 
-    private final Cache<Field, Option> cache;
+    private final LoadingCache<Field, Option> cache;
     private final Field field;
 
-    RedisMembersInjector(Cache<Field, Option> cache, Field field) {
+    RedisMembersInjector(LoadingCache<Field, Option> cache, Field field) {
         this.cache = cache;
         this.field = field;
         this.field.setAccessible(true);

@@ -21,8 +21,8 @@ import java.lang.reflect.Field;
 
 import org.strawberry.redis.RedisLoader;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 
@@ -36,9 +36,9 @@ import fj.data.Option;
  */
 public final class RedisModule extends AbstractModule {
 
-    private final Cache<Field, Option> cache;
+    private final LoadingCache<Field, Option> cache;
 
-    public RedisModule(Cache<Field, Option> cache) {
+    public RedisModule(LoadingCache<Field, Option> cache) {
         this.cache = cache;
     }
 
