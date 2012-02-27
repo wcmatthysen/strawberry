@@ -30,8 +30,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Annotate fields of your class into which an
- * {@link com.google.inject.Injector} should inject values from a Redis
- * database.
+ * {@link com.google.inject.Injector} should inject values from a
+ * <a href="http://redis.io">Redis</a> database.
  * 
  * @author Wiehann Matthysen
  */
