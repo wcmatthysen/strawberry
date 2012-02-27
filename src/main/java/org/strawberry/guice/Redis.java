@@ -70,7 +70,7 @@ public @interface Redis {
      * type are supported: {@code char([])} and {@code Character([])},
      * {@code String}, {@code byte([])} and {@code Byte([]}, {@code boolean} and
      * {@code Boolean}, {@code short} and {@code Short}, {@code int} and
-     * {@code Integer}, {@code long} and {@cod Long}, {@code BigInteger},
+     * {@code Integer}, {@code long} and {@code Long}, {@code BigInteger},
      * {@code float} and {@code Float}, {@code double} and {@code Double},
      * {@code BigDecimal}, {@code Map}, {@code List} and {@code Set}.
      * Otherwise, if true, null will be used as the candidate-value if no
