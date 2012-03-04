@@ -4,7 +4,7 @@ A lightweight Java utility library that utilizes [Google Guice](http://code.goog
 
 Installing with Maven
 ---------------------
-To use strawberry with [Maven](http://maven.apache.org) 2/3, you must add the following repository to your project's `pom.xml` file:
+To use strawberry with [Maven](http://maven.apache.org) 2/3, you must add the following repository to your project's _pom.xml_ file:
 
 ```xml
 <repository>
