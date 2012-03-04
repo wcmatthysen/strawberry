@@ -4,7 +4,7 @@ A lightweight Java utility library that utilizes [Google Guice](http://code.goog
 
 ******
 
-Installing With Maven
+Installing with Maven
 ---------------------
 To use strawberry with [Maven](http://maven.apache.org) 2/3, you must add the following repository to your project's `pom.xml` file:
 
@@ -30,20 +30,18 @@ Then, you can add the following dependency:
 
 Getting Started
 ---------------
-The following section assumes that you have access to Redis on your own machine (or another machine on your LAN). For Linux users the [installation instructions](http://redis.io/download) are listed on the Redis website, whereas Windows users will need to put in some addtional [effort](http://suretalent.blogspot.com/2011/11/installing-redis-database-as-windows.html) in getting Redis to run natively.
+The following section assumes that you have access to Redis on your own machine (or another machine on your LAN). For Linux users the [installation instructions](http://redis.io/download) are listed on the Redis website, whereas Windows users will need to put in some additional [effort](http://suretalent.blogspot.com/2011/11/installing-redis-database-as-windows.html) in getting Redis to run natively.
 
-To start off we are going to populate Redis with a couple of configuration values. Let's assume that you have a string, double, integer and boolean configuration value stored at keys _config:string_, _config:double_, _config:int_, _config:boolean_ respectively. You can use `redi-cli` to set these values by executing the following commands:
+To start off we are going to populate Redis with a couple of configuration values. Let's assume that you have a string, double, integer and boolean configuration value stored at keys _config:string_, _config:double_, _config:int_, _config:boolean_ respectively. You can use _redi-cli_ to set these values by executing the following commands:
 
-``
-redis 127.0.0.1:6379> set config:string "test value"
-OK
-redis 127.0.0.1:6379> set config:double "0.123456"
-OK
-redis 127.0.0.1:6379> set config:int "123456"
-OK
-redis 127.0.0.1:6379> set config:boolean "True"
-OK
-``
+    redis 127.0.0.1:6379> set config:string "test value"
+    OK
+    redis 127.0.0.1:6379> set config:double "0.123456"
+    OK
+    redis 127.0.0.1:6379> set config:int "123456"
+    OK
+    redis 127.0.0.1:6379> set config:boolean "True"
+    OK
 
 Next, we assume that you have a class named `ConfigStore`. Suppose that this class serves as storage mechanism for all configuration values in your application. The first step in populating `ConfigStore`'s fields with values from the Redis database would be to make use of the `@Redis`-annotation as the following code-snippet shows:
 
@@ -125,15 +123,13 @@ public class MyApplication {
 
 If you run this application you should see the following output:
 
-``
-test value
-0.123456
-123456
-true
-``
+    test value
+    0.123456
+    123456
+    true
 
 ******
 
 Where to go from here?
 ----------------------
-For more complex examples (such as aggregate field or complex datastructure injection) you can consult the wiki-pages. The test cases also provides for usage examples.
+For more complex examples (such as aggregate field or complex data-structure injection) you can consult the Wiki-pages. The test cases also provides for usage examples.
