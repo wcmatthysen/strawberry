@@ -43,7 +43,7 @@ To start off we are going to populate Redis with a couple of configuration value
     redis 127.0.0.1:6379> set config:boolean "True"
     OK
 
-Next, we assume that you have a class named `ConfigStore`. Suppose that this class serves as storage mechanism for all configuration values in your application. The first step in populating `ConfigStore`'s fields with values from the Redis database would be to make use of the `@Redis`-annotation as the following code-snippet shows:
+Next, we assume that you have a class named _ConfigStore_. Suppose that this class serves as storage mechanism for all configuration values in your application. The first step in populating ConfigStore's fields with values from the Redis database would be to make use of the _@Redis_-annotation as the following code-snippet shows:
 
 ```java
 import com.github.strawberry.guice.Redis;
@@ -80,9 +80,9 @@ public class ConfigStore {
 }
 ```
 
-Next, we need to install `RedisModule` in one of our Google Guice modules (or use it as our main module). The `RedisModule` class that ships with strawberry is responsible for setting up the custom injections that need to occur for the `@Redis`-annotated fields in `ConfigStore` (or any other class that have `@Redis`-annotated fields). `RedisModule` expects a `JedisPool` (pool of [Jedis](https://github.com/xetorthio/jedis) connections to a Redis database) as constructor argument.
+Next, we need to install _RedisModule_ in one of our Google Guice modules (or use it as our main module). The RedisModule class that ships with strawberry is responsible for setting up the custom injections that need to occur for the @Redis-annotated fields in ConfigStore (or any other class that have @Redis-annotated fields). RedisModule expects a _JedisPool_ (pool of [Jedis](https://github.com/xetorthio/jedis) connections to a Redis database) as constructor argument.
 
-Thus, assuming that we have our main module `MyCustomModule` containing bindings for our application, we can install `RedisModule` as follows:
+Thus, assuming that we have our main module _MyCustomModule_ containing bindings for our application, we can install RedisModule as follows:
 
 ```java
 import com.github.strawberry.guice.RedisModule;
@@ -101,7 +101,7 @@ public class MyCustomModule extends AbstractModule {
 }
 ```
 
-Finally, we can provide this module to our main `Injector` and let Guice inject the values inside our `ConfigStore` instance as the following code-snippet shows:
+Finally, we can provide this module to our main _Injector_ and let Guice inject the field values for our ConfigStore instance as the following code-snippet shows:
 
 ```java
 import com.google.inject.Guice;
