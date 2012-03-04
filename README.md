@@ -2,8 +2,6 @@ strawberry
 ==========
 A lightweight Java utility library that utilizes [Google Guice](http://code.google.com/p/google-guice) to inject data-structures from a [Redis](http://redis.io) database into object instance fields. The name of the library was roughly constructed as follows: _Red_(is) + _Guice_ = _Strawberry_(-juice). This library should not be seen as an alternative to [Johm](https://github.com/xetorthio/johm) (a very powerful Object-Hash Mapping library) but rather a compliment. Johm is designed for storing (and retrieving) Java objects in Redis, whereas strawberry's main focus is on reading (and caching) configuration values from Redis and injecting these values (which could be list or map structures) into object instance fields.
 
-******
-
 Installing with Maven
 ---------------------
 To use strawberry with [Maven](http://maven.apache.org) 2/3, you must add the following repository to your project's `pom.xml` file:
@@ -25,8 +23,6 @@ Then, you can add the following dependency:
   <version>1.0.0</version>
 </dependency>
 ```
-
-******
 
 Getting Started
 ---------------
@@ -128,8 +124,24 @@ If you run this application you should see the following output:
     123456
     true
 
-******
-
 Where to go from here?
 ----------------------
 For more complex examples (such as aggregate field or complex data-structure injection) you can consult the Wiki-pages. The test cases also provides for usage examples.
+
+License
+-------
+Strawberry Library
+Copyright (C) 2011 - 2012
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, see <http://www.gnu.org/licenses/>.
