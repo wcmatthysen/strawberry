@@ -76,7 +76,7 @@ public class ConfigStore {
 }
 ```
 
-Next, we need to install _RedisModule_ in one of our Google Guice modules (or use it as our main module). The RedisModule class that ships with strawberry is responsible for setting up the custom injections that need to occur for the @Redis-annotated fields in ConfigStore (or any other class that have @Redis-annotated fields). RedisModule expects a _JedisPool_ (pool of [Jedis](https://github.com/xetorthio/jedis) connections to a Redis database) as constructor argument.
+Then, we need to install _RedisModule_ in one of our Google Guice modules (or use it as our main module). The RedisModule class that ships with strawberry is responsible for setting up the custom injections that need to occur for the @Redis-annotated fields in ConfigStore (or any other class that have @Redis-annotated fields). RedisModule expects a _JedisPool_ (pool of [Jedis](https://github.com/xetorthio/jedis) connections to a Redis database) as constructor argument.
 
 Thus, assuming that we have our main module _MyCustomModule_ containing bindings for our application, we can install RedisModule as follows:
 
