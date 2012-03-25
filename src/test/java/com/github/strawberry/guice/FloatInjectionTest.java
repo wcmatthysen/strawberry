@@ -66,7 +66,7 @@ public class FloatInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveFloatWithoutKey {
+    public static class PrimitiveFloatContainer {
 
         @Redis(value = "test:float", allowNull = false)
         private float injectedFloat;
@@ -76,7 +76,7 @@ public class FloatInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveFloatWithoutKeyAllowNull {
+    public static class PrimitiveFloatAllowNullContainer {
 
         @Redis(value = "test:float", forceUpdate = true)
         private float injectedFloat;
@@ -86,9 +86,9 @@ public class FloatInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveFloatWithoutKeyDefaultValue{
+    public static class PrimitiveFloatDefaultValueContainer{
 
-        @Redis(value = "test:float")
+        @Redis("test:float")
         private float injectedFloat = 123.4f;
 
         public float getInjectedFloat() {
@@ -97,72 +97,72 @@ public class FloatInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_float() {
+    public void test_that_string_is_converted_into_primitive_float() {
         this.jedis.set("test:float", "123.456");
-        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        PrimitiveFloatContainer dummy = this.injector.getInstance(PrimitiveFloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(123.456f));
         this.jedis.set("test:float", ".123");
-        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveFloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(0.123f));
         this.jedis.set("test:float", "1.23f");
-        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveFloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(1.23f));
         this.jedis.set("test:float", "NaN");
-        dummy = this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveFloatContainer.class);
         assertThat(Float.isNaN(dummy.getInjectedFloat()), is(true));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_float_to_null() {
-        this.injector.getInstance(PrimitiveFloatWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveFloatAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_float() {
-        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
-            PrimitiveFloatWithoutKey.class);
+        PrimitiveFloatContainer dummy = this.injector.getInstance(
+            PrimitiveFloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(0.0f));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_float() {
         // Test for case where no value is present in redis database.
-        PrimitiveFloatWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveFloatWithoutKeyDefaultValue.class);
+        PrimitiveFloatDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveFloatDefaultValueContainer.class);
         assertThat(dummy.getInjectedFloat(), is(123.4f));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:float", "4.56");
-        dummy = this.injector.getInstance(PrimitiveFloatWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveFloatDefaultValueContainer.class);
         assertThat(dummy.getInjectedFloat(), is(4.56f));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_float() {
         this.jedis.set("test:float", "invalid");
-        this.injector.getInstance(PrimitiveFloatWithoutKey.class);
+        this.injector.getInstance(PrimitiveFloatContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_overflows_to_infinity_when_converting_to_primitive_float() {
         this.jedis.set("test:float", "-3.4028236e+38f");
-        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
-            PrimitiveFloatWithoutKey.class);
+        PrimitiveFloatContainer dummy = this.injector.getInstance(
+            PrimitiveFloatContainer.class);
         assertThat(Float.isInfinite(dummy.getInjectedFloat()), is(true));
     }
 
     @Test
     public void test_that_too_large_value_overflows_to_infinity_when_converting_to_primitive_float() {
         this.jedis.set("test:float", "3.4028236e+38f");
-        PrimitiveFloatWithoutKey dummy = this.injector.getInstance(
-            PrimitiveFloatWithoutKey.class);
+        PrimitiveFloatContainer dummy = this.injector.getInstance(
+            PrimitiveFloatContainer.class);
         assertThat(Float.isInfinite(dummy.getInjectedFloat()), is(true));
     }
 
 
 
-    public static class FloatWithoutKey {
+    public static class FloatContainer {
 
         @Redis(value = "test:float", allowNull = false)
         private Float injectedFloat;
@@ -172,7 +172,7 @@ public class FloatInjectionTest extends AbstractModule {
         }
     }
 
-    public static class FloatWithoutKeyAllowNull {
+    public static class FloatAllowNullContainer {
 
         @Redis("test:float")
         private Float injectedFloat;
@@ -182,9 +182,9 @@ public class FloatInjectionTest extends AbstractModule {
         }
     }
     
-    public static class FloatWithoutKeyDefaultValue{
+    public static class FloatDefaultValueContainer {
 
-        @Redis(value = "test:float")
+        @Redis("test:float")
         private Float injectedFloat = 123.4f;
 
         public Float getInjectedFloat() {
@@ -193,65 +193,65 @@ public class FloatInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_float() {
+    public void test_that_string_is_converted_into_float() {
         this.jedis.set("test:float", "123.456");
-        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        FloatContainer dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(123.456f));
         this.jedis.set("test:float", ".123");
-        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(0.123f));
         this.jedis.set("test:float", "1.23f");
-        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(1.23f));
         this.jedis.set("test:float", "NaN");
-        dummy = this.injector.getInstance(FloatWithoutKey.class);
+        dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat().isNaN(), is(true));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_float() {
-        FloatWithoutKeyAllowNull dummy = this.injector.getInstance(
-            FloatWithoutKeyAllowNull.class);
+        FloatAllowNullContainer dummy = this.injector.getInstance(
+            FloatAllowNullContainer.class);
         assertThat(dummy.getInjectedFloat(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_float() {
-        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        FloatContainer dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat(), is(0.0f));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_float() {
         // Test for case where no value is present in redis database.
-        FloatWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            FloatWithoutKeyDefaultValue.class);
+        FloatDefaultValueContainer dummy = this.injector.getInstance(
+            FloatDefaultValueContainer.class);
         assertThat(dummy.getInjectedFloat(), is(123.4f));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:float", "4.56");
-        dummy = this.injector.getInstance(FloatWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(FloatDefaultValueContainer.class);
         assertThat(dummy.getInjectedFloat(), is(4.56f));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_float() {
         this.jedis.set("test:float", "invalid");
-        this.injector.getInstance(FloatWithoutKey.class);
+        this.injector.getInstance(FloatContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_overflows_to_infinity_when_converting_to_float() {
         this.jedis.set("test:float", "-3.4028236e+38f");
-        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        FloatContainer dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat().isInfinite(), is(true));
     }
 
     @Test
     public void test_that_too_large_value_overflows_to_infinity_when_converting_to_float() {
         this.jedis.set("test:float", "3.4028236e+38f");
-        FloatWithoutKey dummy = this.injector.getInstance(FloatWithoutKey.class);
+        FloatContainer dummy = this.injector.getInstance(FloatContainer.class);
         assertThat(dummy.getInjectedFloat().isInfinite(), is(true));
     }
 }

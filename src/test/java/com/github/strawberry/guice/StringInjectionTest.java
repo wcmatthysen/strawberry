@@ -72,7 +72,7 @@ public class StringInjectionTest extends AbstractModule {
 
 
 
-    public static class StringWithoutKey {
+    public static class StringContainer {
 
         @Redis(value = "test:string", allowNull = false)
         private String injectedString;
@@ -82,19 +82,67 @@ public class StringInjectionTest extends AbstractModule {
         }
     }
     
-    public static class StringWithoutKeyDefaultValue {
+    public static class StringAllowNullContainer {
 
-        @Redis(value = "test:string")
+        @Redis("test:string")
+        private String injectedString;
+
+        public String getInjectedString() {
+            return this.injectedString;
+        }
+    }
+    
+    public static class StringDefaultValueContainer {
+
+        @Redis("test:string")
         private String injectedString = "default_value";
 
         public String getInjectedString() {
             return this.injectedString;
         }
     }
+    
+    @Test
+    public void test_that_string_is_injected_into_string() {
+        String expectedString = "test_value";
+        this.jedis.set("test:string", expectedString);
+        StringContainer dummy = this.injector.getInstance(StringContainer.class);
+        assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_null_into_string() {
+        StringAllowNullContainer dummy = this.injector.getInstance(
+            StringAllowNullContainer.class);
+        assertThat(dummy.getInjectedString(), is(nullValue()));
+    }
+    
+    @Test
+    public void test_that_missing_value_is_injected_as_blank_into_string() {
+        StringContainer dummy = this.injector.getInstance(StringContainer.class);
+        assertThat(dummy.getInjectedString(), is(equalTo("")));
+    }
+    
+    @Test
+    public void test_that_missing_value_causes_default_value_to_be_set_for_string() {
+        // Test for case where no value is present in redis database.
+        StringDefaultValueContainer dummy = this.injector.getInstance(
+            StringDefaultValueContainer.class);
+        assertThat(dummy.getInjectedString(), is(equalTo("default_value")));
+        
+        // Test for case where value is present in redis database.
+        // Default value should be overwritten.
+        String expectedString = "test_value";
+        this.jedis.set("test:string", expectedString);
+        dummy = this.injector.getInstance(StringDefaultValueContainer.class);
+        assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
+    }
+    
+    
+    
+    public static class StringInMapContainer {
 
-    public static class StringWithKey {
-
-        @Redis(value = "test:string", includeKeys = true)
+        @Redis("test:string")
         private Map<String, String> injectedString;
 
         public Map<String, String> getInjectedString() {
@@ -102,7 +150,19 @@ public class StringInjectionTest extends AbstractModule {
         }
     }
 
-    public static class StringInListWithoutKey {
+    @Test
+    public void test_that_string_is_injected_into_map() {
+        String expectedString = "test_value";
+        this.jedis.set("test:string", expectedString);
+        StringInMapContainer dummy = this.injector.getInstance(StringInMapContainer.class);
+        Map<String, String> actualStringMap = dummy.getInjectedString();
+        assertThat(actualStringMap.size(), is(1));
+        assertThat(actualStringMap.get("test:string"), is(equalTo(expectedString)));
+    }
+    
+    
+    
+    public static class StringInListContainer {
 
         @Redis("test:string")
         private List<String> injectedString;
@@ -112,7 +172,19 @@ public class StringInjectionTest extends AbstractModule {
         }
     }
 
-    public static class StringInSetWithoutKey {
+    @Test
+    public void test_that_string_is_injected_into_list() {
+        String expectedString = "test_value";
+        this.jedis.set("test:string", expectedString);
+        StringInListContainer dummy = this.injector.getInstance(StringInListContainer.class);
+        List<String> actualStringList = dummy.getInjectedString();
+        assertThat(actualStringList.size(), is(1));
+        assertThat(actualStringList.get(0), is(equalTo(expectedString)));
+    }
+    
+    
+    
+    public static class StringInSetContainer {
 
         @Redis("test:string")
         private Set<String> injectedString;
@@ -122,79 +194,13 @@ public class StringInjectionTest extends AbstractModule {
         }
     }
 
-    public static class StringWithoutKeyAllowNull {
-
-        @Redis(value = "test:string", allowNull = true)
-        private String injectedString;
-
-        public String getInjectedString() {
-            return this.injectedString;
-        }
-    }
-
     @Test
-    public void test_that_string_without_key_is_injected_into_string() {
+    public void test_that_string_is_injected_into_set() {
         String expectedString = "test_value";
         this.jedis.set("test:string", expectedString);
-        StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
-        assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
-    }
-
-    @Test
-    public void test_that_string_with_key_is_injected_into_map() {
-        String expectedString = "test_value";
-        this.jedis.set("test:string", expectedString);
-        StringWithKey dummy = this.injector.getInstance(StringWithKey.class);
-        Map<String, String> actualStringMap = dummy.getInjectedString();
-        assertThat(actualStringMap.size(), is(1));
-        assertThat(actualStringMap.get("test:string"), is(equalTo(expectedString)));
-    }
-
-    @Test
-    public void test_that_string_without_key_is_injected_into_list() {
-        String expectedString = "test_value";
-        this.jedis.set("test:string", expectedString);
-        StringInListWithoutKey dummy = this.injector.getInstance(StringInListWithoutKey.class);
-        List<String> actualStringList = dummy.getInjectedString();
-        assertThat(actualStringList.size(), is(1));
-        assertThat(actualStringList.get(0), is(equalTo(expectedString)));
-    }
-
-    @Test
-    public void test_that_string_without_key_is_injected_into_set() {
-        String expectedString = "test_value";
-        this.jedis.set("test:string", expectedString);
-        StringInSetWithoutKey dummy = this.injector.getInstance(StringInSetWithoutKey.class);
+        StringInSetContainer dummy = this.injector.getInstance(StringInSetContainer.class);
         Set<String> actualStringSet = dummy.getInjectedString();
         assertThat(actualStringSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualStringSet), is(equalTo(expectedString)));
-    }
-
-    @Test
-    public void test_that_missing_value_is_injected_as_null_into_string() {
-        StringWithoutKeyAllowNull dummy = this.injector.getInstance(
-            StringWithoutKeyAllowNull.class);
-        assertThat(dummy.getInjectedString(), is(nullValue()));
-    }
-    
-    @Test
-    public void test_that_missing_value_causes_default_value_to_be_set_for_string() {
-        // Test for case where no value is present in redis database.
-        StringWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            StringWithoutKeyDefaultValue.class);
-        assertThat(dummy.getInjectedString(), is(equalTo("default_value")));
-        
-        // Test for case where value is present in redis database.
-        // Default value should be overwritten.
-        String expectedString = "test_value";
-        this.jedis.set("test:string", expectedString);
-        dummy = this.injector.getInstance(StringWithoutKeyDefaultValue.class);
-        assertThat(dummy.getInjectedString(), is(equalTo(expectedString)));
-    }
-
-    @Test
-    public void test_that_missing_value_is_injected_as_blank_into_string() {
-        StringWithoutKey dummy = this.injector.getInstance(StringWithoutKey.class);
-        assertThat(dummy.getInjectedString(), is(equalTo("")));
     }
 }

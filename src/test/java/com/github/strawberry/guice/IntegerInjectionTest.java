@@ -66,7 +66,7 @@ public class IntegerInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveIntegerWithoutKey {
+    public static class PrimitiveIntegerContainer {
 
         @Redis(value = "test:integer", allowNull = false)
         private int injectedInteger;
@@ -76,7 +76,7 @@ public class IntegerInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveIntegerWithoutKeyAllowNull {
+    public static class PrimitiveIntegerAllowNullContainer {
 
         @Redis(value = "test:integer", forceUpdate = true)
         private int injectedInteger;
@@ -86,9 +86,9 @@ public class IntegerInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveIntegerWithoutKeyDefaultValue {
+    public static class PrimitiveIntegerDefaultValueContainer {
 
-        @Redis(value = "test:integer")
+        @Redis("test:integer")
         private int injectedInteger = 123;
 
         public int getInjectedInteger() {
@@ -97,62 +97,62 @@ public class IntegerInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_integer() {
+    public void test_that_string_is_converted_into_primitive_integer() {
         this.jedis.set("test:integer", "123");
-        PrimitiveIntegerWithoutKey dummy = this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+        PrimitiveIntegerContainer dummy = this.injector.getInstance(PrimitiveIntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         this.jedis.set("test:integer", "-123");
-        dummy = this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveIntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_integer_to_null() {
-        this.injector.getInstance(PrimitiveIntegerWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveIntegerAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_integer() {
-        PrimitiveIntegerWithoutKey dummy = this.injector.getInstance(
-            PrimitiveIntegerWithoutKey.class);
+        PrimitiveIntegerContainer dummy = this.injector.getInstance(
+            PrimitiveIntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_integer() {
         // Test for case where no value is present in redis database.
-        PrimitiveIntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveIntegerWithoutKeyDefaultValue.class);
+        PrimitiveIntegerDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveIntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:integer", "456");
-        dummy = this.injector.getInstance(PrimitiveIntegerWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveIntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedInteger(), is(456));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_integer() {
         this.jedis.set("test:integer", "invalid");
-        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+        this.injector.getInstance(PrimitiveIntegerContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_primitive_integer() {
         this.jedis.set("test:integer", "-2147483649");
-        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+        this.injector.getInstance(PrimitiveIntegerContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_primitive_integer() {
         this.jedis.set("test:integer", "2147483648");
-        this.injector.getInstance(PrimitiveIntegerWithoutKey.class);
+        this.injector.getInstance(PrimitiveIntegerContainer.class);
     }
 
 
 
-    public static class IntegerWithoutKey {
+    public static class IntegerContainer {
 
         @Redis(value = "test:integer", allowNull = false)
         private Integer injectedInteger;
@@ -162,7 +162,7 @@ public class IntegerInjectionTest extends AbstractModule {
         }
     }
 
-    public static class IntegerWithoutKeyAllowNull {
+    public static class IntegerAllowNullContainer {
 
         @Redis("test:integer")
         private Integer injectedInteger;
@@ -172,9 +172,9 @@ public class IntegerInjectionTest extends AbstractModule {
         }
     }
     
-    public static class IntegerWithoutKeyDefaultValue {
+    public static class IntegerDefaultValueContainer {
 
-        @Redis(value = "test:integer")
+        @Redis("test:integer")
         private Integer injectedInteger = 123;
 
         public Integer getInjectedInteger() {
@@ -183,57 +183,57 @@ public class IntegerInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_integer() {
+    public void test_that_string_is_converted_into_integer() {
         this.jedis.set("test:integer", "123");
-        IntegerWithoutKey dummy = this.injector.getInstance(IntegerWithoutKey.class);
+        IntegerContainer dummy = this.injector.getInstance(IntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         this.jedis.set("test:integer", "-123");
-        dummy = this.injector.getInstance(IntegerWithoutKey.class);
+        dummy = this.injector.getInstance(IntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(-123));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_integer() {
-        IntegerWithoutKeyAllowNull dummy = this.injector.getInstance(
-            IntegerWithoutKeyAllowNull.class);
+        IntegerAllowNullContainer dummy = this.injector.getInstance(
+            IntegerAllowNullContainer.class);
         assertThat(dummy.getInjectedInteger(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_integer() {
-        IntegerWithoutKey dummy = this.injector.getInstance(IntegerWithoutKey.class);
+        IntegerContainer dummy = this.injector.getInstance(IntegerContainer.class);
         assertThat(dummy.getInjectedInteger(), is(0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_integer() {
         // Test for case where no value is present in redis database.
-        IntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            IntegerWithoutKeyDefaultValue.class);
+        IntegerDefaultValueContainer dummy = this.injector.getInstance(
+            IntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedInteger(), is(123));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:integer", "456");
-        dummy = this.injector.getInstance(IntegerWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(IntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedInteger(), is(456));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "invalid");
-        this.injector.getInstance(IntegerWithoutKey.class);
+        this.injector.getInstance(IntegerContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "-2147483649");
-        this.injector.getInstance(IntegerWithoutKey.class);
+        this.injector.getInstance(IntegerContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_integer() {
         this.jedis.set("test:integer", "2147483648");
-        this.injector.getInstance(IntegerWithoutKey.class);
+        this.injector.getInstance(IntegerContainer.class);
     }
 }

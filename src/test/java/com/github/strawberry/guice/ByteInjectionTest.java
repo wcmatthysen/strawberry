@@ -68,7 +68,7 @@ public class ByteInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveByteArrayWithoutKey {
+    public static class PrimitiveByteArrayContainer {
 
         @Redis(value = "test:bytes", allowNull = false)
         private byte[] injectedBytes;
@@ -78,7 +78,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveByteArrayWithoutKeyAllowNull {
+    public static class PrimitiveByteArrayAllowNullContainer {
 
         @Redis("test:bytes")
         private byte[] injectedBytes;
@@ -88,7 +88,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveByteArrayWithoutKeyDefaultValue {
+    public static class PrimitiveByteArrayDefaultValueContainer {
 
         @Redis("test:bytes")
         private byte[] injectedBytes = {(byte)1, (byte)2, (byte)3};
@@ -99,44 +99,44 @@ public class ByteInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_injected_into_primitive_byte_array() {
+    public void test_that_string_is_injected_into_primitive_byte_array() {
         this.jedis.set("test:bytes", "test_value");
-        PrimitiveByteArrayWithoutKey dummy = this.injector.getInstance(
-            PrimitiveByteArrayWithoutKey.class);
+        PrimitiveByteArrayContainer dummy = this.injector.getInstance(
+            PrimitiveByteArrayContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo("test_value".getBytes())));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_primitive_byte_array() {
-        PrimitiveByteArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
-            PrimitiveByteArrayWithoutKeyAllowNull.class);
+        PrimitiveByteArrayAllowNullContainer dummy = this.injector.getInstance(
+            PrimitiveByteArrayAllowNullContainer.class);
         assertThat(dummy.getInjectedBytes(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_empty_array_into_primitive_byte_array() {
-        PrimitiveByteArrayWithoutKey dummy = this.injector.getInstance(
-            PrimitiveByteArrayWithoutKey.class);
+        PrimitiveByteArrayContainer dummy = this.injector.getInstance(
+            PrimitiveByteArrayContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new byte[]{})));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_byte_array() {
         // Test for case where no value is present in redis database.
-        PrimitiveByteArrayWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveByteArrayWithoutKeyDefaultValue.class);
+        PrimitiveByteArrayDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveByteArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new byte[]{(byte)1, (byte)2, (byte)3})));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:bytes", "test_value");
-        dummy = this.injector.getInstance(PrimitiveByteArrayWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveByteArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo("test_value".getBytes())));
     }
 
 
 
-    public static class ByteArrayWithoutKey {
+    public static class ByteArrayContainer {
 
         @Redis(value = "test:bytes", allowNull = false)
         private Byte[] injectedBytes;
@@ -146,7 +146,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
 
-    public static class ByteArrayWithoutKeyAllowNull {
+    public static class ByteArrayAllowNullContainer {
 
         @Redis("test:bytes")
         private Byte[] injectedBytes;
@@ -156,7 +156,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ByteArrayWithoutKeyDefaultValue {
+    public static class ByteArrayDefaultValueContainer {
 
         @Redis("test:bytes")
         private Byte[] injectedBytes = {(byte)1, (byte)2, (byte)3};
@@ -167,43 +167,43 @@ public class ByteInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_injected_into_byte_array() {
+    public void test_that_string_is_injected_into_byte_array() {
         this.jedis.set("test:bytes", "test_value");
-        ByteArrayWithoutKey dummy = this.injector.getInstance(ByteArrayWithoutKey.class);
+        ByteArrayContainer dummy = this.injector.getInstance(ByteArrayContainer.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedBytes()), is(equalTo("test_value".getBytes())));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_byte_array() {
-        ByteArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
-            ByteArrayWithoutKeyAllowNull.class);
+        ByteArrayAllowNullContainer dummy = this.injector.getInstance(
+            ByteArrayAllowNullContainer.class);
         assertThat(dummy.getInjectedBytes(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_empty_array_into_byte_array() {
-        ByteArrayWithoutKey dummy = this.injector.getInstance(
-            ByteArrayWithoutKey.class);
+        ByteArrayContainer dummy = this.injector.getInstance(
+            ByteArrayContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new Byte[]{})));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_byte_array() {
         // Test for case where no value is present in redis database.
-        ByteArrayWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            ByteArrayWithoutKeyDefaultValue.class);
+        ByteArrayDefaultValueContainer dummy = this.injector.getInstance(
+            ByteArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedBytes(), is(equalTo(new Byte[]{(byte)1, (byte)2, (byte)3})));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:bytes", "test_value");
-        dummy = this.injector.getInstance(ByteArrayWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(ByteArrayDefaultValueContainer.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedBytes()), is(equalTo("test_value".getBytes())));
     }
 
 
 
-    public static class PrimitiveByteWithoutKey {
+    public static class PrimitiveByteContainer {
 
         @Redis(value = "test:byte", allowNull = false)
         private byte injectedByte;
@@ -213,7 +213,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveByteWithoutKeyAllowNull {
+    public static class PrimitiveByteAllowNullContainer {
 
         @Redis(value = "test:byte", forceUpdate = true)
         private byte injectedByte;
@@ -223,7 +223,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveByteWithoutKeyDefaultValue {
+    public static class PrimitiveByteDefaultValueContainer {
 
         @Redis("test:byte")
         private byte injectedByte = (byte)12;
@@ -234,62 +234,62 @@ public class ByteInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_byte() {
+    public void test_that_string_is_converted_into_primitive_byte() {
         this.jedis.set("test:byte", "12");
-        PrimitiveByteWithoutKey dummy = this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        PrimitiveByteContainer dummy = this.injector.getInstance(PrimitiveByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)12));
         this.jedis.set("test:byte", "-13");
-        dummy = this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)-13));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_byte_to_null() {
-        this.injector.getInstance(PrimitiveByteWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveByteAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_byte() {
-        PrimitiveByteWithoutKey dummy = this.injector.getInstance(
-            PrimitiveByteWithoutKey.class);
+        PrimitiveByteContainer dummy = this.injector.getInstance(
+            PrimitiveByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_byte() {
         // Test for case where no value is present in redis database.
-        PrimitiveByteWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveByteWithoutKeyDefaultValue.class);
+        PrimitiveByteDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveByteDefaultValueContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)12));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:byte", "-13");
-        dummy = this.injector.getInstance(PrimitiveByteWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveByteDefaultValueContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)-13));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_byte() {
         this.jedis.set("test:byte", "invalid");
-        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        this.injector.getInstance(PrimitiveByteContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_primitive_byte() {
         this.jedis.set("test:byte", "-129");
-        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        this.injector.getInstance(PrimitiveByteContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_primitive_byte() {
         this.jedis.set("test:byte", "128");
-        this.injector.getInstance(PrimitiveByteWithoutKey.class);
+        this.injector.getInstance(PrimitiveByteContainer.class);
     }
 
 
 
-    public static class ByteWithoutKey {
+    public static class ByteContainer {
 
         @Redis(value = "test:byte", allowNull = false)
         private Byte injectedByte;
@@ -299,7 +299,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
 
-    public static class ByteWithoutKeyAllowNull {
+    public static class ByteAllowNullContainer {
 
         @Redis("test:byte")
         private Byte injectedByte;
@@ -309,7 +309,7 @@ public class ByteInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ByteWithoutKeyDefaultValue {
+    public static class ByteDefaultValueContainer {
 
         @Redis("test:byte")
         private Byte injectedByte = (byte)12;
@@ -320,57 +320,57 @@ public class ByteInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_byte() {
+    public void test_that_string_is_converted_into_byte() {
         this.jedis.set("test:byte", "12");
-        ByteWithoutKey dummy = this.injector.getInstance(ByteWithoutKey.class);
+        ByteContainer dummy = this.injector.getInstance(ByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)12));
         this.jedis.set("test:byte", "-13");
-        dummy = this.injector.getInstance(ByteWithoutKey.class);
+        dummy = this.injector.getInstance(ByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)-13));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_byte() {
-        ByteWithoutKeyAllowNull dummy = this.injector.getInstance(
-            ByteWithoutKeyAllowNull.class);
+        ByteAllowNullContainer dummy = this.injector.getInstance(
+            ByteAllowNullContainer.class);
         assertThat(dummy.getInjectedByte(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_byte() {
-        ByteWithoutKey dummy = this.injector.getInstance(ByteWithoutKey.class);
+        ByteContainer dummy = this.injector.getInstance(ByteContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_byte() {
         // Test for case where no value is present in redis database.
-        ByteWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            ByteWithoutKeyDefaultValue.class);
+        ByteDefaultValueContainer dummy = this.injector.getInstance(
+            ByteDefaultValueContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)12));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:byte", "-13");
-        dummy = this.injector.getInstance(ByteWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(ByteDefaultValueContainer.class);
         assertThat(dummy.getInjectedByte(), is((byte)-13));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_byte() {
         this.jedis.set("test:byte", "invalid");
-        this.injector.getInstance(ByteWithoutKey.class);
+        this.injector.getInstance(ByteContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_byte() {
         this.jedis.set("test:byte", "-129");
-        this.injector.getInstance(ByteWithoutKey.class);
+        this.injector.getInstance(ByteContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_byte() {
         this.jedis.set("test:byte", "128");
-        this.injector.getInstance(ByteWithoutKey.class);
+        this.injector.getInstance(ByteContainer.class);
     }
 }

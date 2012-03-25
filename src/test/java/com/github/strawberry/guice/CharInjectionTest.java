@@ -68,7 +68,7 @@ public class CharInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveCharArrayWithoutKey {
+    public static class PrimitiveCharArrayContainer {
 
         @Redis(value = "test:chars", allowNull = false)
         private char[] injectedChars;
@@ -78,7 +78,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveCharArrayWithoutKeyAllowNull {
+    public static class PrimitiveCharArrayAllowNullContainer {
 
         @Redis("test:chars")
         private char[] injectedChars;
@@ -88,7 +88,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveCharArrayWithoutKeyDefaultValue {
+    public static class PrimitiveCharArrayDefaultValueContainer {
 
         @Redis("test:chars")
         private char[] injectedChars = {'t', 'e', 's', 't'};
@@ -99,44 +99,44 @@ public class CharInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_injected_into_primitive_char_array() {
+    public void test_that_string_is_injected_into_primitive_char_array() {
         this.jedis.set("test:chars", "test_value");
-        PrimitiveCharArrayWithoutKey dummy = this.injector.getInstance(
-            PrimitiveCharArrayWithoutKey.class);
+        PrimitiveCharArrayContainer dummy = this.injector.getInstance(
+            PrimitiveCharArrayContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo("test_value".toCharArray())));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_primitive_char_array() {
-        PrimitiveCharArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
-            PrimitiveCharArrayWithoutKeyAllowNull.class);
+        PrimitiveCharArrayAllowNullContainer dummy = this.injector.getInstance(
+            PrimitiveCharArrayAllowNullContainer.class);
         assertThat(dummy.getInjectedChars(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_empty_array_into_primitive_char_array() {
-        PrimitiveCharArrayWithoutKey dummy = this.injector.getInstance(
-            PrimitiveCharArrayWithoutKey.class);
+        PrimitiveCharArrayContainer dummy = this.injector.getInstance(
+            PrimitiveCharArrayContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new char[]{})));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_char_array() {
         // Test for case where no value is present in redis database.
-        PrimitiveCharArrayWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveCharArrayWithoutKeyDefaultValue.class);
+        PrimitiveCharArrayDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveCharArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new char[]{'t', 'e', 's', 't'})));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:chars", "test_value");
-        dummy = this.injector.getInstance(PrimitiveCharArrayWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveCharArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo("test_value".toCharArray())));
     }
 
 
 
-    public static class CharArrayWithoutKey {
+    public static class CharArrayContainer {
 
         @Redis(value = "test:chars", allowNull = false)
         private Character[] injectedChars;
@@ -146,7 +146,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
 
-    public static class CharArrayWithoutKeyAllowNull {
+    public static class CharArrayAllowNullContainer {
 
         @Redis("test:chars")
         private Character[] injectedChars;
@@ -156,7 +156,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
     
-    public static class CharArrayWithoutKeyDefaultValue {
+    public static class CharArrayDefaultValueContainer {
 
         @Redis("test:chars")
         private Character[] injectedChars = {'t', 'e', 's', 't'};
@@ -167,42 +167,42 @@ public class CharInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_injected_into_char_array() {
+    public void test_that_string_is_injected_into_char_array() {
         this.jedis.set("test:chars", "test_value");
-        CharArrayWithoutKey dummy = this.injector.getInstance(CharArrayWithoutKey.class);
+        CharArrayContainer dummy = this.injector.getInstance(CharArrayContainer.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedChars()), is(equalTo("test_value".toCharArray())));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_char_array() {
-        CharArrayWithoutKeyAllowNull dummy = this.injector.getInstance(
-            CharArrayWithoutKeyAllowNull.class);
+        CharArrayAllowNullContainer dummy = this.injector.getInstance(
+            CharArrayAllowNullContainer.class);
         assertThat(dummy.getInjectedChars(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_empty_array_into_char_array() {
-        CharArrayWithoutKey dummy = this.injector.getInstance(CharArrayWithoutKey.class);
+        CharArrayContainer dummy = this.injector.getInstance(CharArrayContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new Character[]{})));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_char_array() {
         // Test for case where no value is present in redis database.
-        CharArrayWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            CharArrayWithoutKeyDefaultValue.class);
+        CharArrayDefaultValueContainer dummy = this.injector.getInstance(
+            CharArrayDefaultValueContainer.class);
         assertThat(dummy.getInjectedChars(), is(equalTo(new Character[]{'t', 'e', 's', 't'})));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:chars", "test_value");
-        dummy = this.injector.getInstance(CharArrayWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(CharArrayDefaultValueContainer.class);
         assertThat(ArrayUtils.toPrimitive(dummy.getInjectedChars()), is(equalTo("test_value".toCharArray())));
     }
 
 
 
-    public static class PrimitiveCharWithoutKey {
+    public static class PrimitiveCharContainer {
 
         @Redis(value = "test:char", allowNull = false)
         private char injectedChar;
@@ -212,7 +212,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveCharWithoutKeyAllowNull {
+    public static class PrimitiveCharAllowNullContainer {
 
         @Redis(value = "test:char", forceUpdate = true)
         private char injectedChar;
@@ -222,7 +222,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveCharWithoutKeyDefaultValue {
+    public static class PrimitiveCharDefaultValueContainer {
 
         @Redis("test:char")
         private char injectedChar = 't';
@@ -233,46 +233,46 @@ public class CharInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_char() {
+    public void test_that_string_is_converted_into_primitive_char() {
         this.jedis.set("test:char", "A");
-        PrimitiveCharWithoutKey dummy = this.injector.getInstance(PrimitiveCharWithoutKey.class);
+        PrimitiveCharContainer dummy = this.injector.getInstance(PrimitiveCharContainer.class);
         assertThat(dummy.getInjectedChar(), is('A'));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_char_to_null() {
-        this.injector.getInstance(PrimitiveCharWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveCharAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_character_into_primitive_char() {
-        PrimitiveCharWithoutKey dummy = this.injector.getInstance(PrimitiveCharWithoutKey.class);
+        PrimitiveCharContainer dummy = this.injector.getInstance(PrimitiveCharContainer.class);
         assertThat(dummy.getInjectedChar(), is('\0'));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_char() {
         // Test for case where no value is present in redis database.
-        PrimitiveCharWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveCharWithoutKeyDefaultValue.class);
+        PrimitiveCharDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveCharDefaultValueContainer.class);
         assertThat(dummy.getInjectedChar(), is('t'));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:char", "A");
-        dummy = this.injector.getInstance(PrimitiveCharWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveCharDefaultValueContainer.class);
         assertThat(dummy.getInjectedChar(), is('A'));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_char() {
         this.jedis.set("test:char", "invalid");
-        this.injector.getInstance(PrimitiveCharWithoutKey.class);
+        this.injector.getInstance(PrimitiveCharContainer.class);
     }
 
 
 
-    public static class CharWithoutKey {
+    public static class CharContainer {
 
         @Redis(value = "test:char", allowNull = false)
         private Character injectedChar;
@@ -282,7 +282,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
 
-    public static class CharWithoutKeyAllowNull {
+    public static class CharAllowNullContainer {
 
         @Redis("test:char")
         private Character injectedChar;
@@ -292,7 +292,7 @@ public class CharInjectionTest extends AbstractModule {
         }
     }
     
-    public static class CharWithoutKeyDefaultValue {
+    public static class CharDefaultValueContainer {
 
         @Redis("test:char")
         private Character injectedChar = 't';
@@ -303,42 +303,42 @@ public class CharInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_char() {
+    public void test_that_string_is_converted_into_char() {
         this.jedis.set("test:char", "A");
-        CharWithoutKey dummy = this.injector.getInstance(CharWithoutKey.class);
+        CharContainer dummy = this.injector.getInstance(CharContainer.class);
         assertThat(dummy.getInjectedChar(), is('A'));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_char() {
-        CharWithoutKeyAllowNull dummy = this.injector.getInstance(
-            CharWithoutKeyAllowNull.class);
+        CharAllowNullContainer dummy = this.injector.getInstance(
+            CharAllowNullContainer.class);
         assertThat(dummy.getInjectedChar(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_char() {
-        CharWithoutKey dummy = this.injector.getInstance(CharWithoutKey.class);
+        CharContainer dummy = this.injector.getInstance(CharContainer.class);
         assertThat(dummy.getInjectedChar(), is('\0'));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_char() {
         // Test for case where no value is present in redis database.
-        CharWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            CharWithoutKeyDefaultValue.class);
+        CharDefaultValueContainer dummy = this.injector.getInstance(
+            CharDefaultValueContainer.class);
         assertThat(dummy.getInjectedChar(), is('t'));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:char", "A");
-        dummy = this.injector.getInstance(CharWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(CharDefaultValueContainer.class);
         assertThat(dummy.getInjectedChar(), is('A'));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_char() {
         this.jedis.set("test:char", "invalid");
-        this.injector.getInstance(CharWithoutKey.class);
+        this.injector.getInstance(CharContainer.class);
     }
 }

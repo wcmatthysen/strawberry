@@ -66,7 +66,7 @@ public class DoubleInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveDoubleWithoutKey {
+    public static class PrimitiveDoubleContainer {
 
         @Redis(value = "test:double", allowNull = false)
         private double injectedDouble;
@@ -76,7 +76,7 @@ public class DoubleInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveDoubleWithoutKeyAllowNull {
+    public static class PrimitiveDoubleAllowNullContainer {
 
         @Redis(value = "test:double", forceUpdate = true)
         private double injectedDouble;
@@ -86,7 +86,7 @@ public class DoubleInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveDoubleWithoutKeyDefaultValue {
+    public static class PrimitiveDoubleDefaultValueContainer {
 
         @Redis("test:double")
         private double injectedDouble = 123.4;
@@ -97,69 +97,69 @@ public class DoubleInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_double() {
+    public void test_that_string_is_converted_into_primitive_double() {
         this.jedis.set("test:double", "123.456");
-        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
+        PrimitiveDoubleContainer dummy = this.injector.getInstance(PrimitiveDoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(123.456));
         this.jedis.set("test:double", ".123");
-        dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveDoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
         this.jedis.set("test:double", "NaN");
-        dummy = this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveDoubleContainer.class);
         assertThat(Double.isNaN(dummy.getInjectedDouble()), is(true));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_double_to_null() {
-        this.injector.getInstance(PrimitiveDoubleWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveDoubleAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_double() {
-        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
-            PrimitiveDoubleWithoutKey.class);
+        PrimitiveDoubleContainer dummy = this.injector.getInstance(
+            PrimitiveDoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(0.0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_double() {
         // Test for case where no value is present in redis database.
-        PrimitiveDoubleWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveDoubleWithoutKeyDefaultValue.class);
+        PrimitiveDoubleDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveDoubleDefaultValueContainer.class);
         assertThat(dummy.getInjectedDouble(), is(123.4));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:double", "4.56");
-        dummy = this.injector.getInstance(PrimitiveDoubleWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveDoubleDefaultValueContainer.class);
         assertThat(dummy.getInjectedDouble(), is(4.56));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_double() {
         this.jedis.set("test:double", "invalid");
-        this.injector.getInstance(PrimitiveDoubleWithoutKey.class);
+        this.injector.getInstance(PrimitiveDoubleContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_overflows_to_infinity_when_converting_to_primitive_double() {
         this.jedis.set("test:double", "-1.7976931348623159e+308");
-        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
-            PrimitiveDoubleWithoutKey.class);
+        PrimitiveDoubleContainer dummy = this.injector.getInstance(
+            PrimitiveDoubleContainer.class);
         assertThat(Double.isInfinite(dummy.getInjectedDouble()), is(true));
     }
 
     @Test
     public void test_that_too_large_value_overflows_to_infinity_when_converting_to_primitive_double() {
         this.jedis.set("test:double", "1.7976931348623159e+308");
-        PrimitiveDoubleWithoutKey dummy = this.injector.getInstance(
-            PrimitiveDoubleWithoutKey.class);
+        PrimitiveDoubleContainer dummy = this.injector.getInstance(
+            PrimitiveDoubleContainer.class);
         assertThat(Double.isInfinite(dummy.getInjectedDouble()), is(true));
     }
 
 
 
-    public static class DoubleWithoutKey {
+    public static class DoubleContainer {
 
         @Redis(value = "test:double", allowNull = false)
         private Double injectedDouble;
@@ -169,7 +169,7 @@ public class DoubleInjectionTest extends AbstractModule {
         }
     }
 
-    public static class DoubleWithoutKeyAllowNull {
+    public static class DoubleAllowNullContainer {
 
         @Redis("test:double")
         private Double injectedDouble;
@@ -179,7 +179,7 @@ public class DoubleInjectionTest extends AbstractModule {
         }
     }
     
-    public static class DoubleWithoutKeyDefaultValue {
+    public static class DoubleDefaultValueContainer {
 
         @Redis("test:double")
         private Double injectedDouble = 123.4;
@@ -190,62 +190,62 @@ public class DoubleInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_double() {
+    public void test_that_string_is_converted_into_double() {
         this.jedis.set("test:double", "123.456");
-        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        DoubleContainer dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(123.456));
         this.jedis.set("test:double", ".123");
-        dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(0.123));
         this.jedis.set("test:double", "NaN");
-        dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble().isNaN(), is(true));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_double() {
-        DoubleWithoutKeyAllowNull dummy = this.injector.getInstance(
-            DoubleWithoutKeyAllowNull.class);
+        DoubleAllowNullContainer dummy = this.injector.getInstance(
+            DoubleAllowNullContainer.class);
         assertThat(dummy.getInjectedDouble(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_double() {
-        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        DoubleContainer dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble(), is(0.0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_double() {
         // Test for case where no value is present in redis database.
-        DoubleWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            DoubleWithoutKeyDefaultValue.class);
+        DoubleDefaultValueContainer dummy = this.injector.getInstance(
+            DoubleDefaultValueContainer.class);
         assertThat(dummy.getInjectedDouble(), is(123.4));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:double", "4.56");
-        dummy = this.injector.getInstance(DoubleWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(DoubleDefaultValueContainer.class);
         assertThat(dummy.getInjectedDouble(), is(4.56));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_double() {
         this.jedis.set("test:double", "invalid");
-        this.injector.getInstance(DoubleWithoutKey.class);
+        this.injector.getInstance(DoubleContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_overflows_to_infinity_when_converting_to_double() {
         this.jedis.set("test:double", "-1.7976931348623159e+308");
-        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        DoubleContainer dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble().isInfinite(), is(true));
     }
 
     @Test
     public void test_that_too_large_value_overflows_to_infinity_when_converting_to_double() {
         this.jedis.set("test:double", "1.7976931348623159e+308");
-        DoubleWithoutKey dummy = this.injector.getInstance(DoubleWithoutKey.class);
+        DoubleContainer dummy = this.injector.getInstance(DoubleContainer.class);
         assertThat(dummy.getInjectedDouble().isInfinite(), is(true));
     }
 }

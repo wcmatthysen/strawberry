@@ -75,7 +75,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class StringsWithoutKeys {
+    public static class StringsInListContainer {
         
         @Redis("test:string:*")
         private List<String> injectedStrings;
@@ -85,7 +85,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class StringsWithoutKeysDefaultValue {
+    public static class StringsInListDefaultValueContainer {
         
         @Redis("test:string:*")
         private List<String> injectedStrings = ImmutableList.of(
@@ -97,22 +97,22 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_strings_without_keys_are_injected_into_list() {
+    public void test_that_strings_are_injected_into_list() {
         String testString = "test_value:%s";
         List<String> expectedList = Lists.newArrayList();
         for (int i = 0; i < 10; ++i) {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedList.add(String.format(testString, i));
         }
-        StringsWithoutKeys dummy = this.injector.getInstance(StringsWithoutKeys.class);
+        StringsInListContainer dummy = this.injector.getInstance(StringsInListContainer.class);
         assertThat(Sets.newHashSet(dummy.getInjectedStrings()), is(equalTo(Sets.newHashSet(expectedList))));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list() {
         // Test for case where no value is present in redis database.
-        StringsWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            StringsWithoutKeysDefaultValue.class);
+        StringsInListDefaultValueContainer dummy = this.injector.getInstance(
+            StringsInListDefaultValueContainer.class);
         List<String> defaultList = ImmutableList.of("value_01", "value_02", "value_03");
         assertThat(dummy.getInjectedStrings(), is(equalTo(defaultList)));
         
@@ -124,15 +124,15 @@ public class AggregateInjectionTest extends AbstractModule {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedList.add(String.format(testString, i));
         }
-        dummy = this.injector.getInstance(StringsWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(StringsInListDefaultValueContainer.class);
         assertThat(Sets.newHashSet(dummy.getInjectedStrings()), is(equalTo(Sets.newHashSet(expectedList))));
     }
     
     
     
-    public static class StringsWithKeys {
+    public static class StringsInMapContainer {
         
-        @Redis(value = "test:string:*", includeKeys = true)
+        @Redis("test:string:*")
         private Map<String, String> injectedStrings;
         
         public Map<String, String> getInjectedStrings() {
@@ -140,9 +140,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class StringsWithKeysDefaultValue {
+    public static class StringsInMapDefaultValueContainer {
         
-        @Redis(value = "test:string:*", includeKeys = true)
+        @Redis("test:string:*")
         private Map<String, String> injectedStrings = ImmutableMap.of(
             "key_01", "value_01",
             "key_02", "value_02",
@@ -155,22 +155,22 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_strings_with_keys_are_injected_into_map() {
+    public void test_that_strings_are_injected_into_map() {
         String testString = "test_value:%s";
         Map<String, String> expectedMap = Maps.newLinkedHashMap();
         for (int i = 0; i < 10; ++i) {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedMap.put(String.format("test:string:%s", i), String.format(testString, i));
         }
-        StringsWithKeys dummy = this.injector.getInstance(StringsWithKeys.class);
+        StringsInMapContainer dummy = this.injector.getInstance(StringsInMapContainer.class);
         assertThat(dummy.getInjectedStrings(), is(equalTo(expectedMap)));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map() {
         // Test for case where no value is present in redis database.
-        StringsWithKeysDefaultValue dummy = this.injector.getInstance(
-            StringsWithKeysDefaultValue.class);
+        StringsInMapDefaultValueContainer dummy = this.injector.getInstance(
+            StringsInMapDefaultValueContainer.class);
         Map<String, String> defaultMap = ImmutableMap.of(
             "key_01", "value_01",
             "key_02", "value_02",
@@ -186,13 +186,13 @@ public class AggregateInjectionTest extends AbstractModule {
             this.jedis.set(String.format("test:string:%s", i), String.format(testString, i));
             expectedMap.put(String.format("test:string:%s", i), String.format(testString, i));
         }
-        dummy = this.injector.getInstance(StringsWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(StringsInMapDefaultValueContainer.class);
         assertThat(dummy.getInjectedStrings(), is(equalTo(expectedMap)));
     }
     
     
     
-    public static class MapsWithoutKeys {
+    public static class MapsInListContainer {
         
         @Redis("test:map:*")
         private List<Map<String, String>> injectedMaps;
@@ -202,7 +202,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MapsWithoutKeysDefaultValue {
+    public static class MapsInListDefaultValueContainer {
         
         @Redis("test:map:*")
         private List<Map<String, String>> injectedMaps = (List)ImmutableList.of(
@@ -224,7 +224,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_maps_without_keys_are_injected_into_list_of_map() {
+    public void test_that_maps_are_injected_into_list_of_map() {
         for (int i = 0; i < 10; ++i) {
             Map<String, String> testMap = ImmutableMap.of(
                 String.format("key_%s1", i), String.format("value_%s1", i),
@@ -233,7 +233,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        MapsWithoutKeys dummy = this.injector.getInstance(MapsWithoutKeys.class);
+        MapsInListContainer dummy = this.injector.getInstance(MapsInListContainer.class);
         List<Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -249,8 +249,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list_of_map() {
         // Test for case where no value is present in redis database.
-        MapsWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            MapsWithoutKeysDefaultValue.class);
+        MapsInListDefaultValueContainer dummy = this.injector.getInstance(
+            MapsInListDefaultValueContainer.class);
         List<Map<String, String>> defaultList = (List)ImmutableList.of(
             ImmutableMap.of(
                 "key_11", "value_11",
@@ -275,7 +275,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        dummy = this.injector.getInstance(MapsWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(MapsInListDefaultValueContainer.class);
         List<Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -290,9 +290,9 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class MapsWithKeys {
+    public static class MapsInMapContainer {
         
-        @Redis(value = "test:map:*", includeKeys = true)
+        @Redis("test:map:*")
         private Map<String, Map<String, String>> injectedMaps;
         
         public Map<String, Map<String, String>> getInjectedMaps() {
@@ -300,9 +300,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class MapsWithKeysDefaultValue {
+    public static class MapsInMapDefaultValueContainer {
         
-        @Redis(value = "test:map:*", includeKeys = true)
+        @Redis("test:map:*")
         private Map<String, Map<String, String>> injectedMaps = (Map)ImmutableMap.of(
             "test_map_01", ImmutableMap.of(
                 "key_11", "value_11",
@@ -322,7 +322,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_maps_with_keys_are_injected_into_map_of_map() {
+    public void test_that_maps_are_injected_into_map_of_map() {
         for (int i = 0; i < 10; ++i) {
             Map<String, String> testMap = ImmutableMap.of(
                 String.format("key_%s1", i), String.format("value_%s1", i),
@@ -331,7 +331,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        MapsWithKeys dummy = this.injector.getInstance(MapsWithKeys.class);
+        MapsInMapContainer dummy = this.injector.getInstance(MapsInMapContainer.class);
         Map<String, Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -347,8 +347,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map_of_map() {
         // Test for case where no value is present in redis database.
-        MapsWithKeysDefaultValue dummy = this.injector.getInstance(
-            MapsWithKeysDefaultValue.class);
+        MapsInMapDefaultValueContainer dummy = this.injector.getInstance(
+            MapsInMapDefaultValueContainer.class);
         Map<String, Map<String, String>> defaultMap = (Map)ImmutableMap.of(
             "test_map_01", ImmutableMap.of(
                 "key_11", "value_11",
@@ -373,7 +373,7 @@ public class AggregateInjectionTest extends AbstractModule {
             );
             this.jedis.hmset(String.format("test:map:%s", i), testMap);
         }
-        dummy = this.injector.getInstance(MapsWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(MapsInMapDefaultValueContainer.class);
         Map<String, Map<String, String>> actualMaps = dummy.getInjectedMaps();
         assertThat(actualMaps.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -388,7 +388,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class ListsWithoutKeys {
+    public static class ListsInListContainer {
         
         @Redis("test:list:*")
         private List<List<String>> injectedLists;
@@ -398,7 +398,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ListsWithoutKeysDefaultValue {
+    public static class ListsInListDefaultValueContainer {
         
         @Redis("test:list:*")
         private List<List<String>> injectedLists = (List)ImmutableList.of(
@@ -412,14 +412,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_lists_without_keys_are_injected_into_list_of_list() {
+    public void test_that_lists_are_injected_into_list_of_list() {
         List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        ListsWithoutKeys dummy = this.injector.getInstance(ListsWithoutKeys.class);
+        ListsInListContainer dummy = this.injector.getInstance(ListsInListContainer.class);
         List<List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -435,8 +435,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list_of_list() {
         // Test for case where no value is present in redis database.
-        ListsWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            ListsWithoutKeysDefaultValue.class);
+        ListsInListDefaultValueContainer dummy = this.injector.getInstance(
+            ListsInListDefaultValueContainer.class);
         List<List<String>> defaultList = (List)ImmutableList.of(
             ImmutableList.of("value_11", "value_12", "value_13"),
             ImmutableList.of("value_21", "value_22", "value_23")
@@ -451,7 +451,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(ListsWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(ListsInListDefaultValueContainer.class);
         List<List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -466,9 +466,9 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class ListsWithKeys {
+    public static class ListsInMapContainer {
         
-        @Redis(value = "test:list:*", includeKeys = true)
+        @Redis("test:list:*")
         private Map<String, List<String>> injectedLists;
         
         public Map<String, List<String>> getInjectedLists() {
@@ -476,9 +476,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ListsWithKeysDefaultValue {
+    public static class ListsInMapDefaultValueContainer {
         
-        @Redis(value = "test:list:*", includeKeys = true)
+        @Redis("test:list:*")
         private Map<String, List<String>> injectedLists = (Map)ImmutableMap.of(
             "test_list_01", ImmutableList.of(
                 "value_11", "value_12", "value_13"
@@ -494,14 +494,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_lists_with_keys_are_injected_into_map_of_list() {
+    public void test_that_lists_are_injected_into_map_of_list() {
         List<String> testList = Lists.newArrayList("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        ListsWithKeys dummy = this.injector.getInstance(ListsWithKeys.class);
+        ListsInMapContainer dummy = this.injector.getInstance(ListsInMapContainer.class);
         Map<String, List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -517,8 +517,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map_of_list() {
         // Test for case where no value is present in redis database.
-        ListsWithKeysDefaultValue dummy = this.injector.getInstance(
-            ListsWithKeysDefaultValue.class);
+        ListsInMapDefaultValueContainer dummy = this.injector.getInstance(
+            ListsInMapDefaultValueContainer.class);
         Map<String, List<String>> defaultMap = (Map)ImmutableMap.of(
             "test_list_01", ImmutableList.of(
                 "value_11", "value_12", "value_13"
@@ -537,7 +537,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.rpush(String.format("test:list:%s", i), String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(ListsWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(ListsInMapDefaultValueContainer.class);
         Map<String, List<String>> actualLists = dummy.getInjectedLists();
         assertThat(actualLists.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -552,7 +552,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class SetsWithoutKeys {
+    public static class SetsInListContainer {
         
         @Redis("test:set:*")
         private List<Set<String>> injectedSets;
@@ -562,7 +562,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SetsWithoutKeysDefaultValue {
+    public static class SetsInListDefaultValueContainer {
         
         @Redis("test:set:*")
         private List<Set<String>> injectedSets = (List)ImmutableList.of(
@@ -576,14 +576,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_sets_without_keys_are_injected_into_list_of_set() {
+    public void test_that_sets_are_injected_into_list_of_set() {
         Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testSet) {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        SetsWithoutKeys dummy = this.injector.getInstance(SetsWithoutKeys.class);
+        SetsInListContainer dummy = this.injector.getInstance(SetsInListContainer.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -599,8 +599,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list_of_set() {
         // Test for case where no value is present in redis database.
-        SetsWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            SetsWithoutKeysDefaultValue.class);
+        SetsInListDefaultValueContainer dummy = this.injector.getInstance(
+            SetsInListDefaultValueContainer.class);
         List<Set<String>> defaultList = (List)ImmutableList.of(
             Sets.newHashSet("value_11", "value_12", "value_13"),
             Sets.newHashSet("value_21", "value_22", "value_23")
@@ -615,7 +615,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(SetsWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(SetsInListDefaultValueContainer.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -630,9 +630,9 @@ public class AggregateInjectionTest extends AbstractModule {
 
     
     
-    public static class SetsWithKeys {
+    public static class SetsInMapContainer {
         
-        @Redis(value = "test:set:*", includeKeys = true)
+        @Redis("test:set:*")
         private Map<String, Set<String>> injectedSets;
         
         public Map<String, Set<String>> getInjectedSets() {
@@ -640,9 +640,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class SetsWithKeysDefaultValue {
+    public static class SetsInMapDefaultValueContainer {
         
-        @Redis(value = "test:set:*", includeKeys = true)
+        @Redis("test:set:*")
         private Map<String, Set<String>> injectedSets = (Map)ImmutableMap.of(
             "test_set_01", Sets.newHashSet(
                 "value_11", "value_12", "value_13"
@@ -658,14 +658,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_sets_with_keys_are_injected_into_map_of_set() {
+    public void test_that_sets_are_injected_into_map_of_set() {
         Set<String> testSet = Sets.newHashSet("value_%s1", "value_%s2", "value_%s3");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testSet) {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        SetsWithKeys dummy = this.injector.getInstance(SetsWithKeys.class);
+        SetsInMapContainer dummy = this.injector.getInstance(SetsInMapContainer.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -681,8 +681,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map_of_set() {
         // Test for case where no value is present in redis database.
-        SetsWithKeysDefaultValue dummy = this.injector.getInstance(
-            SetsWithKeysDefaultValue.class);
+        SetsInMapDefaultValueContainer dummy = this.injector.getInstance(
+            SetsInMapDefaultValueContainer.class);
         Map<String, Set<String>> defaultMap = (Map)ImmutableMap.of(
             "test_set_01", Sets.newHashSet(
                 "value_11", "value_12", "value_13"
@@ -701,7 +701,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.sadd(String.format("test:set:%s", i), String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(SetsWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(SetsInMapDefaultValueContainer.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -716,7 +716,7 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class OrderedSetsWithoutKeys {
+    public static class OrderedSetsInListContainer {
         
         @Redis("test:zset:*")
         private List<Set<String>> injectedSets;
@@ -726,7 +726,7 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class OrderedSetsWithoutKeysDefaultValue {
+    public static class OrderedSetsInListDefaultValueContainer {
         
         @Redis("test:zset:*")
         private List<Set<String>> injectedSets = (List)ImmutableList.of(
@@ -740,14 +740,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_ordered_sets_without_keys_are_injected_into_list_of_set() {
+    public void test_that_ordered_sets_are_injected_into_list_of_set() {
         List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        OrderedSetsWithoutKeys dummy = this.injector.getInstance(OrderedSetsWithoutKeys.class);
+        OrderedSetsInListContainer dummy = this.injector.getInstance(OrderedSetsInListContainer.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -765,8 +765,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list_of_zset() {
         // Test for case where no value is present in redis database.
-        OrderedSetsWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            OrderedSetsWithoutKeysDefaultValue.class);
+        OrderedSetsInListDefaultValueContainer dummy = this.injector.getInstance(
+            OrderedSetsInListDefaultValueContainer.class);
         List<Set<String>> defaultList = (List)ImmutableList.of(
             Sets.newLinkedHashSet(Lists.newArrayList("value_11", "value_12", "value_13")),
             Sets.newLinkedHashSet(Lists.newArrayList("value_21", "value_22", "value_23"))
@@ -781,7 +781,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(OrderedSetsWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(OrderedSetsInListDefaultValueContainer.class);
         List<Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -798,9 +798,9 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class OrderedSetsWithKeys {
+    public static class OrderedSetsInMapContainer {
         
-        @Redis(value = "test:zset:*", includeKeys = true)
+        @Redis("test:zset:*")
         private Map<String, Set<String>> injectedSets;
         
         public Map<String, Set<String>> getInjectedSets() {
@@ -808,9 +808,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class OrderedSetsWithKeysDefaultValue {
+    public static class OrderedSetsInMapDefaultValueContainer {
         
-        @Redis(value = "test:zset:*", includeKeys = true)
+        @Redis("test:zset:*")
         private Map<String, Set<String>> injectedSets = (Map)ImmutableMap.of(
             "test_set_01", Sets.newLinkedHashSet(
                 Lists.newArrayList("value_11", "value_12", "value_13")
@@ -826,14 +826,14 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_ordered_sets_with_keys_are_injected_into_map_of_set() {
+    public void test_that_ordered_sets_are_injected_into_map_of_set() {
         List<String> testList = Lists.newArrayList("value_%s3", "value_%s2", "value_%s1");
         for (int i = 0; i < 10; ++i) {
             for (String testValue : testList) {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        OrderedSetsWithKeys dummy = this.injector.getInstance(OrderedSetsWithKeys.class);
+        OrderedSetsInMapContainer dummy = this.injector.getInstance(OrderedSetsInMapContainer.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -851,8 +851,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map_of_zset() {
         // Test for case where no value is present in redis database.
-        OrderedSetsWithKeysDefaultValue dummy = this.injector.getInstance(
-            OrderedSetsWithKeysDefaultValue.class);
+        OrderedSetsInMapDefaultValueContainer dummy = this.injector.getInstance(
+            OrderedSetsInMapDefaultValueContainer.class);
         Map<String, Set<String>> defaultMap = (Map)ImmutableMap.of(
             "test_set_01", Sets.newLinkedHashSet(
                 Lists.newArrayList("value_11", "value_12", "value_13")
@@ -871,7 +871,7 @@ public class AggregateInjectionTest extends AbstractModule {
                 this.jedis.zadd(String.format("test:zset:%s", i), i, String.format(testValue, i));
             }
         }
-        dummy = this.injector.getInstance(OrderedSetsWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(OrderedSetsInMapDefaultValueContainer.class);
         Map<String, Set<String>> actualSets = dummy.getInjectedSets();
         assertThat(actualSets.size(), is(10));
         for (int i = 0; i < 10; ++i) {
@@ -888,9 +888,9 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class HeterogeneousWithoutKeys {
+    public static class HeterogeneousInListContainer {
         
-        @Redis(value = "test:heterogeneous:*")
+        @Redis("test:heterogeneous:*")
         private List<Object> injectedObjects;
         
         public List<Object> getInjectedObjects() {
@@ -898,9 +898,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class HeterogeneousWithoutKeysDefaultValue {
+    public static class HeterogeneousInListDefaultValueContainer {
         
-        @Redis(value = "test:heterogeneous:*")
+        @Redis("test:heterogeneous:*")
         private List<Object> injectedObjects = (List)Lists.newArrayList(
             "value_01", "value_02", "value_03",
             ImmutableMap.of(
@@ -919,7 +919,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_objects_without_keys_are_injected_into_list_of_objects() {
+    public void test_that_objects_are_injected_into_list_of_objects() {
         // Inject some strings.
         for (int i = 0; i < 3; ++i) {
             this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
@@ -959,7 +959,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        HeterogeneousWithoutKeys dummy = this.injector.getInstance(HeterogeneousWithoutKeys.class);
+        HeterogeneousInListContainer dummy = this.injector.getInstance(HeterogeneousInListContainer.class);
         List<Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         
@@ -1012,8 +1012,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_list_of_objects() {
         // Test for case where no value is present in redis database.
-        HeterogeneousWithoutKeysDefaultValue dummy = this.injector.getInstance(
-            HeterogeneousWithoutKeysDefaultValue.class);
+        HeterogeneousInListDefaultValueContainer dummy = this.injector.getInstance(
+            HeterogeneousInListDefaultValueContainer.class);
         List<Object> defaultList = (List)Lists.newArrayList(
             "value_01", "value_02", "value_03",
             ImmutableMap.of(
@@ -1068,7 +1068,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        dummy = this.injector.getInstance(HeterogeneousWithoutKeysDefaultValue.class);
+        dummy = this.injector.getInstance(HeterogeneousInListDefaultValueContainer.class);
         List<Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         
@@ -1120,9 +1120,9 @@ public class AggregateInjectionTest extends AbstractModule {
     
     
     
-    public static class HeterogeneousWithKeys {
+    public static class HeterogeneousInMapContainer {
         
-        @Redis(value = "test:heterogeneous:*", includeKeys = true)
+        @Redis("test:heterogeneous:*")
         private Map<String, Object> injectedObjects;
         
         public Map<String, Object> getInjectedObjects() {
@@ -1130,9 +1130,9 @@ public class AggregateInjectionTest extends AbstractModule {
         }
     }
     
-    public static class HeterogeneousWithKeysDefaultValue {
+    public static class HeterogeneousInMapDefaultValueContainer {
         
-        @Redis(value = "test:heterogeneous:*", includeKeys = true)
+        @Redis("test:heterogeneous:*")
         private Map<String, Object> injectedObjects = (Map)ImmutableMap.of(
             "test_string", "test_value",
             "test_map", ImmutableMap.of(
@@ -1151,7 +1151,7 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
-    public void test_that_objects_with_keys_are_injected_into_map_of_objects() {
+    public void test_that_objects_are_injected_into_map_of_objects() {
         // Inject some strings.
         for (int i = 0; i < 3; ++i) {
             this.jedis.set(String.format("test:heterogeneous:%s", i), String.format("test_value:%s", i));
@@ -1191,7 +1191,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        HeterogeneousWithKeys dummy = this.injector.getInstance(HeterogeneousWithKeys.class);
+        HeterogeneousInMapContainer dummy = this.injector.getInstance(HeterogeneousInMapContainer.class);
         Map<String, Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         
@@ -1249,8 +1249,8 @@ public class AggregateInjectionTest extends AbstractModule {
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_map_of_objects() {
         // Test for case where no value is present in redis database.
-        HeterogeneousWithKeysDefaultValue dummy = this.injector.getInstance(
-            HeterogeneousWithKeysDefaultValue.class);
+        HeterogeneousInMapDefaultValueContainer dummy = this.injector.getInstance(
+            HeterogeneousInMapDefaultValueContainer.class);
         Map<String, Object> defaultMap = (Map)ImmutableMap.of(
             "test_string", "test_value",
             "test_map", ImmutableMap.of(
@@ -1305,7 +1305,7 @@ public class AggregateInjectionTest extends AbstractModule {
             }
         }
         
-        dummy = this.injector.getInstance(HeterogeneousWithKeysDefaultValue.class);
+        dummy = this.injector.getInstance(HeterogeneousInMapDefaultValueContainer.class);
         Map<String, Object> actualObjects = dummy.getInjectedObjects();
         assertThat(actualObjects.size(), is(15));
         

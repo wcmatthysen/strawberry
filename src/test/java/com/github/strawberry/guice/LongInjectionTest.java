@@ -66,7 +66,7 @@ public class LongInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveLongWithoutKey {
+    public static class PrimitiveLongContainer {
 
         @Redis(value = "test:long", allowNull = false)
         private long injectedLong;
@@ -76,7 +76,7 @@ public class LongInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveLongWithoutKeyAllowNull {
+    public static class PrimitiveLongAllowNullContainer {
 
         @Redis(value = "test:long", forceUpdate = true)
         private long injectedLong;
@@ -86,9 +86,9 @@ public class LongInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveLongWithoutKeyDefaultValue {
+    public static class PrimitiveLongDefaultValueContainer {
 
-        @Redis(value = "test:long")
+        @Redis("test:long")
         private long injectedLong = 123L;
 
         public long getInjectedLong() {
@@ -97,62 +97,62 @@ public class LongInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_long() {
+    public void test_that_string_is_converted_into_primitive_long() {
         this.jedis.set("test:long", "123");
-        PrimitiveLongWithoutKey dummy = this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        PrimitiveLongContainer dummy = this.injector.getInstance(PrimitiveLongContainer.class);
         assertThat(dummy.getInjectedLong(), is(123L));
         this.jedis.set("test:long", "-123");
-        dummy = this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveLongContainer.class);
         assertThat(dummy.getInjectedLong(), is(-123L));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_long_to_null() {
-        this.injector.getInstance(PrimitiveLongWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveLongAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_long() {
-        PrimitiveLongWithoutKey dummy = this.injector.getInstance(
-            PrimitiveLongWithoutKey.class);
+        PrimitiveLongContainer dummy = this.injector.getInstance(
+            PrimitiveLongContainer.class);
         assertThat(dummy.getInjectedLong(), is(0L));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_long() {
         // Test for case where no value is present in redis database.
-        PrimitiveLongWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveLongWithoutKeyDefaultValue.class);
+        PrimitiveLongDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveLongDefaultValueContainer.class);
         assertThat(dummy.getInjectedLong(), is(123L));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:long", "456");
-        dummy = this.injector.getInstance(PrimitiveLongWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveLongDefaultValueContainer.class);
         assertThat(dummy.getInjectedLong(), is(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_long() {
         this.jedis.set("test:long", "invalid");
-        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        this.injector.getInstance(PrimitiveLongContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_primitive_long() {
         this.jedis.set("test:long", "-9223372036854775809");
-        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        this.injector.getInstance(PrimitiveLongContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_primitive_long() {
         this.jedis.set("test:long", "9223372036854775808");
-        this.injector.getInstance(PrimitiveLongWithoutKey.class);
+        this.injector.getInstance(PrimitiveLongContainer.class);
     }
 
 
 
-    public static class LongWithoutKey {
+    public static class LongContainer {
 
         @Redis(value = "test:long", allowNull = false)
         private Long injectedLong;
@@ -162,7 +162,7 @@ public class LongInjectionTest extends AbstractModule {
         }
     }
 
-    public static class LongWithoutKeyAllowNull {
+    public static class LongAllowNullContainer {
 
         @Redis("test:long")
         private Long injectedLong;
@@ -172,9 +172,9 @@ public class LongInjectionTest extends AbstractModule {
         }
     }
     
-    public static class LongWithoutKeyDefaultValue {
+    public static class LongDefaultValueContainer {
 
-        @Redis(value = "test:long")
+        @Redis("test:long")
         private Long injectedLong = 123L;
 
         public Long getInjectedLong() {
@@ -183,57 +183,57 @@ public class LongInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_long() {
+    public void test_that_string_is_converted_into_long() {
         this.jedis.set("test:long", "123");
-        LongWithoutKey dummy = this.injector.getInstance(LongWithoutKey.class);
+        LongContainer dummy = this.injector.getInstance(LongContainer.class);
         assertThat(dummy.getInjectedLong(), is(123L));
         this.jedis.set("test:long", "-123");
-        dummy = this.injector.getInstance(LongWithoutKey.class);
+        dummy = this.injector.getInstance(LongContainer.class);
         assertThat(dummy.getInjectedLong(), is(-123L));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_long() {
-        LongWithoutKeyAllowNull dummy = this.injector.getInstance(
-            LongWithoutKeyAllowNull.class);
+        LongAllowNullContainer dummy = this.injector.getInstance(
+            LongAllowNullContainer.class);
         assertThat(dummy.getInjectedLong(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_long() {
-        LongWithoutKey dummy = this.injector.getInstance(LongWithoutKey.class);
+        LongContainer dummy = this.injector.getInstance(LongContainer.class);
         assertThat(dummy.getInjectedLong(), is(0L));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_long() {
         // Test for case where no value is present in redis database.
-        LongWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            LongWithoutKeyDefaultValue.class);
+        LongDefaultValueContainer dummy = this.injector.getInstance(
+            LongDefaultValueContainer.class);
         assertThat(dummy.getInjectedLong(), is(123L));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:long", "456");
-        dummy = this.injector.getInstance(LongWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(LongDefaultValueContainer.class);
         assertThat(dummy.getInjectedLong(), is(456L));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_long() {
         this.jedis.set("test:long", "invalid");
-        this.injector.getInstance(LongWithoutKey.class);
+        this.injector.getInstance(LongContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_long() {
         this.jedis.set("test:long", "-9223372036854775809");
-        this.injector.getInstance(LongWithoutKey.class);
+        this.injector.getInstance(LongContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_long() {
         this.jedis.set("test:long", "9223372036854775808");
-        this.injector.getInstance(LongWithoutKey.class);
+        this.injector.getInstance(LongContainer.class);
     }
 }

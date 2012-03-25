@@ -48,22 +48,6 @@ public @interface Redis {
     String value();
 
     /**
-     * If true and given the key-pattern: the matching Redis key-value pair(s)
-     * will be accumulated and injected as a Map into the annotated field.
-     * Otherwise, if false, only the matching value(s) will be injected.
-     */
-    boolean includeKeys() default false;
-
-    /**
-     * If true and given the key-pattern, the matching value(s) from the Redis
-     * database will be nested inside a collection before being injected into
-     * the annotated field.
-     * Otherwise, if false, values will be injected as-is, and will only be
-     * converted if and when it makes sense.
-     */
-    boolean alwaysNest() default false;
-
-    /**
      * If false, a default value will be injected for the specified type if no
      * matching value for the specified key-pattern exists in the Redis
      * database. This default value is type dependent and only the following

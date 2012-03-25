@@ -66,7 +66,7 @@ public class ShortInjectionTest extends AbstractModule {
 
 
 
-    public static class PrimitiveShortWithoutKey {
+    public static class PrimitiveShortContainer {
 
         @Redis(value = "test:short", allowNull = false)
         private short injectedShort;
@@ -76,7 +76,7 @@ public class ShortInjectionTest extends AbstractModule {
         }
     }
 
-    public static class PrimitiveShortWithoutKeyAllowNull {
+    public static class PrimitiveShortAllowNullContainer {
 
         @Redis(value = "test:short", forceUpdate = true)
         private short injectedShort;
@@ -86,9 +86,9 @@ public class ShortInjectionTest extends AbstractModule {
         }
     }
     
-    public static class PrimitiveShortWithoutKeyDefaultValue {
+    public static class PrimitiveShortDefaultValueContainer {
 
-        @Redis(value = "test:short")
+        @Redis("test:short")
         private short injectedShort = 123;
 
         public short getInjectedShort() {
@@ -97,62 +97,62 @@ public class ShortInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_primitive_short() {
+    public void test_that_string_is_converted_into_primitive_short() {
         this.jedis.set("test:short", "123");
-        PrimitiveShortWithoutKey dummy = this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        PrimitiveShortContainer dummy = this.injector.getInstance(PrimitiveShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)123));
         this.jedis.set("test:short", "-123");
-        dummy = this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        dummy = this.injector.getInstance(PrimitiveShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)-123));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_missing_value_causes_exception_when_setting_primitive_short_to_null() {
-        this.injector.getInstance(PrimitiveShortWithoutKeyAllowNull.class);
+        this.injector.getInstance(PrimitiveShortAllowNullContainer.class);
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_primitive_short() {
-        PrimitiveShortWithoutKey dummy = this.injector.getInstance(
-            PrimitiveShortWithoutKey.class);
+        PrimitiveShortContainer dummy = this.injector.getInstance(
+            PrimitiveShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_primitive_short() {
         // Test for case where no value is present in redis database.
-        PrimitiveShortWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            PrimitiveShortWithoutKeyDefaultValue.class);
+        PrimitiveShortDefaultValueContainer dummy = this.injector.getInstance(
+            PrimitiveShortDefaultValueContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)123));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:short", "456");
-        dummy = this.injector.getInstance(PrimitiveShortWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(PrimitiveShortDefaultValueContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)456));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_primitive_short() {
         this.jedis.set("test:short", "invalid");
-        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        this.injector.getInstance(PrimitiveShortContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_primitive_short() {
         this.jedis.set("test:short", "-32,769");
-        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        this.injector.getInstance(PrimitiveShortContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_primitive_short() {
         this.jedis.set("test:short", "32,768");
-        this.injector.getInstance(PrimitiveShortWithoutKey.class);
+        this.injector.getInstance(PrimitiveShortContainer.class);
     }
 
 
 
-    public static class ShortWithoutKey {
+    public static class ShortContainer {
 
         @Redis(value = "test:short", allowNull = false)
         private Short injectedShort;
@@ -162,7 +162,7 @@ public class ShortInjectionTest extends AbstractModule {
         }
     }
 
-    public static class ShortWithoutKeyAllowNull {
+    public static class ShortAllowNullContainer {
 
         @Redis("test:short")
         private Short injectedShort;
@@ -172,9 +172,9 @@ public class ShortInjectionTest extends AbstractModule {
         }
     }
     
-    public static class ShortWithoutKeyDefaultValue {
+    public static class ShortDefaultValueContainer {
 
-        @Redis(value = "test:short")
+        @Redis("test:short")
         private Short injectedShort = 123;
 
         public Short getInjectedShort() {
@@ -183,57 +183,57 @@ public class ShortInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_short() {
+    public void test_that_string_is_converted_into_short() {
         this.jedis.set("test:short", "123");
-        ShortWithoutKey dummy = this.injector.getInstance(ShortWithoutKey.class);
+        ShortContainer dummy = this.injector.getInstance(ShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)123));
         this.jedis.set("test:short", "-123");
-        dummy = this.injector.getInstance(ShortWithoutKey.class);
+        dummy = this.injector.getInstance(ShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)-123));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_short() {
-        ShortWithoutKeyAllowNull dummy = this.injector.getInstance(
-            ShortWithoutKeyAllowNull.class);
+        ShortAllowNullContainer dummy = this.injector.getInstance(
+            ShortAllowNullContainer.class);
         assertThat(dummy.getInjectedShort(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_short() {
-        ShortWithoutKey dummy = this.injector.getInstance(ShortWithoutKey.class);
+        ShortContainer dummy = this.injector.getInstance(ShortContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_short() {
         // Test for case where no value is present in redis database.
-        ShortWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            ShortWithoutKeyDefaultValue.class);
+        ShortDefaultValueContainer dummy = this.injector.getInstance(
+            ShortDefaultValueContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)123));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:short", "456");
-        dummy = this.injector.getInstance(ShortWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(ShortDefaultValueContainer.class);
         assertThat(dummy.getInjectedShort(), is((short)456));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_short() {
         this.jedis.set("test:short", "invalid");
-        this.injector.getInstance(ShortWithoutKey.class);
+        this.injector.getInstance(ShortContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_small_value_throws_exception_when_converting_to_short() {
         this.jedis.set("test:short", "-32,769");
-        this.injector.getInstance(ShortWithoutKey.class);
+        this.injector.getInstance(ShortContainer.class);
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_too_large_value_throws_exception_when_converting_to_short() {
         this.jedis.set("test:short", "32,768");
-        this.injector.getInstance(ShortWithoutKey.class);
+        this.injector.getInstance(ShortContainer.class);
     }
 }

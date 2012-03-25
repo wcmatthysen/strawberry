@@ -69,7 +69,7 @@ public class BigDecimalInjectionTest extends AbstractModule {
 
 
 
-    public static class BigDecimalWithoutKey {
+    public static class BigDecimalContainer {
 
         @Redis(value = "test:bigdecimal", allowNull = false)
         private BigDecimal bigDecimal;
@@ -79,7 +79,7 @@ public class BigDecimalInjectionTest extends AbstractModule {
         }
     }
 
-    public static class BigDecimalWithoutKeyAllowNull {
+    public static class BigDecimalAllowNullContainer {
 
         @Redis("test:bigdecimal")
         private BigDecimal bigDecimal;
@@ -89,7 +89,7 @@ public class BigDecimalInjectionTest extends AbstractModule {
         }
     }
     
-    public static class BigDecimalWithoutKeyDefaultValue {
+    public static class BigDecimalDefaultValueContainer {
         
         @Redis("test:bigdecimal")
         private BigDecimal bigDecimal = BigDecimal.TEN;
@@ -100,53 +100,53 @@ public class BigDecimalInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_bigdecimal() {
+    public void test_that_string_is_converted_into_bigdecimal() {
         this.jedis.set("test:bigdecimal", "123.456");
-        BigDecimalWithoutKey dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
+        BigDecimalContainer dummy = this.injector.getInstance(BigDecimalContainer.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(123.456));
         this.jedis.set("test:bigdecimal", ".123");
-        dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
+        dummy = this.injector.getInstance(BigDecimalContainer.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(0.123));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_bigdecimal() {
-        BigDecimalWithoutKeyAllowNull dummy = this.injector.getInstance(
-            BigDecimalWithoutKeyAllowNull.class);
+        BigDecimalAllowNullContainer dummy = this.injector.getInstance(
+            BigDecimalAllowNullContainer.class);
         assertThat(dummy.getInjectedBigDecimal(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_bigdecimal() {
-        BigDecimalWithoutKey dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
+        BigDecimalContainer dummy = this.injector.getInstance(BigDecimalContainer.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(0.0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_bigdecimal() {
         // Test for case where no value is present in redis database.
-        BigDecimalWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            BigDecimalWithoutKeyDefaultValue.class);
+        BigDecimalDefaultValueContainer dummy = this.injector.getInstance(
+            BigDecimalDefaultValueContainer.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(10.0));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:bigdecimal", "1.23");
-        dummy = this.injector.getInstance(BigDecimalWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(BigDecimalDefaultValueContainer.class);
         assertThat(dummy.getInjectedBigDecimal().doubleValue(), is(1.23));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_bigdecimal() {
         this.jedis.set("test:bigdecimal", "invalid");
-        this.injector.getInstance(BigDecimalWithoutKey.class);
+        this.injector.getInstance(BigDecimalContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_doesnt_overflow_to_infinity_when_converting_to_bigdecimal() {
         String value = "-179.76931348623159E+306";
         this.jedis.set("test:bigdecimal", value);
-        BigDecimalWithoutKey dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
+        BigDecimalContainer dummy = this.injector.getInstance(BigDecimalContainer.class);
         assertThat(dummy.getInjectedBigDecimal().toEngineeringString(), is(equalTo(value)));
     }
 
@@ -154,7 +154,7 @@ public class BigDecimalInjectionTest extends AbstractModule {
     public void test_that_too_large_value_doesnt_overflow_to_infinity_when_converting_to_bigdecimal() {
         String value = "179.76931348623159E+306";
         this.jedis.set("test:bigdecimal", value);
-        BigDecimalWithoutKey dummy = this.injector.getInstance(BigDecimalWithoutKey.class);
+        BigDecimalContainer dummy = this.injector.getInstance(BigDecimalContainer.class);
         assertThat(dummy.getInjectedBigDecimal().toEngineeringString(), is(equalTo(value)));
     }
 }

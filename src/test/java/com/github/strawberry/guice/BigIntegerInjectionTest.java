@@ -68,7 +68,7 @@ public class BigIntegerInjectionTest extends AbstractModule {
 
 
 
-    public static class BigIntegerWithoutKey {
+    public static class BigIntegerContainer {
 
         @Redis(value = "test:biginteger", allowNull = false)
         private BigInteger bigInteger;
@@ -78,7 +78,7 @@ public class BigIntegerInjectionTest extends AbstractModule {
         }
     }
 
-    public static class BigIntegerWithoutKeyAllowNull {
+    public static class BigIntegerAllowNullContainer {
 
         @Redis("test:biginteger")
         private BigInteger bigInteger;
@@ -88,7 +88,7 @@ public class BigIntegerInjectionTest extends AbstractModule {
         }
     }
     
-    public static class BigIntegerWithoutKeyDefaultValue {
+    public static class BigIntegerDefaultValueContainer {
         
         @Redis("test:biginteger")
         private BigInteger bigInteger = BigInteger.TEN;
@@ -99,67 +99,67 @@ public class BigIntegerInjectionTest extends AbstractModule {
     }
 
     @Test
-    public void test_that_string_without_key_is_converted_into_biginteger() {
+    public void test_that_string_is_converted_into_biginteger() {
         this.jedis.set("test:biginteger", "123");
-        BigIntegerWithoutKey dummy = this.injector.getInstance(BigIntegerWithoutKey.class);
+        BigIntegerContainer dummy = this.injector.getInstance(BigIntegerContainer.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(123));
         this.jedis.set("test:biginteger", "-123");
-        dummy = this.injector.getInstance(BigIntegerWithoutKey.class);
+        dummy = this.injector.getInstance(BigIntegerContainer.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(-123));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_null_into_biginteger() {
-        BigIntegerWithoutKeyAllowNull dummy = this.injector.getInstance(
-            BigIntegerWithoutKeyAllowNull.class);
+        BigIntegerAllowNullContainer dummy = this.injector.getInstance(
+            BigIntegerAllowNullContainer.class);
         assertThat(dummy.getInjectedBigInteger(), is(nullValue()));
     }
 
     @Test
     public void test_that_missing_value_is_injected_as_zero_into_biginteger() {
-        BigIntegerWithoutKey dummy = this.injector.getInstance(BigIntegerWithoutKey.class);
+        BigIntegerContainer dummy = this.injector.getInstance(BigIntegerContainer.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(0));
     }
     
     @Test
     public void test_that_missing_value_causes_default_value_to_be_set_for_biginteger() {
         // Test for case where no value is present in redis database.
-        BigIntegerWithoutKeyDefaultValue dummy = this.injector.getInstance(
-            BigIntegerWithoutKeyDefaultValue.class);
+        BigIntegerDefaultValueContainer dummy = this.injector.getInstance(
+            BigIntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(10));
         
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         this.jedis.set("test:biginteger", "123");
-        dummy = this.injector.getInstance(BigIntegerWithoutKeyDefaultValue.class);
+        dummy = this.injector.getInstance(BigIntegerDefaultValueContainer.class);
         assertThat(dummy.getInjectedBigInteger().intValue(), is(123));
     }
 
     @Test(expected = RuntimeException.class)
     public void test_that_invalid_string_throws_exception_when_converting_to_biginteger() {
         this.jedis.set("test:biginteger", "invalid");
-        this.injector.getInstance(BigIntegerWithoutKey.class);
+        this.injector.getInstance(BigIntegerContainer.class);
     }
 
     @Test
     public void test_that_too_small_value_doesnt_throw_exception_when_converting_to_biginteger() {
         // Test for less than smallest integer.
         this.jedis.set("test:biginteger", "-2147483649");
-        this.injector.getInstance(BigIntegerWithoutKey.class);
+        this.injector.getInstance(BigIntegerContainer.class);
 
         // Test for less than smallest long.
         this.jedis.set("test:biginteger", "-9223372036854775809");
-        this.injector.getInstance(BigIntegerWithoutKey.class);
+        this.injector.getInstance(BigIntegerContainer.class);
     }
 
     @Test
     public void test_that_too_large_value_doesnt_throw_exception_when_converting_to_biginteger() {
         // Test for greater than largest integer.
         this.jedis.set("test:biginteger", "2147483648");
-        this.injector.getInstance(BigIntegerWithoutKey.class);
+        this.injector.getInstance(BigIntegerContainer.class);
 
         // Test for greater than largest long.
         this.jedis.set("test:biginteger", "9223372036854775808");
-        this.injector.getInstance(BigIntegerWithoutKey.class);
+        this.injector.getInstance(BigIntegerContainer.class);
     }
 }
