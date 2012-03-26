@@ -55,8 +55,6 @@ final class RedisMembersInjector<T> implements MembersInjector<T> {
                 // Always set null field.
                 this.field.set(object, value.toNull());
             }
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
