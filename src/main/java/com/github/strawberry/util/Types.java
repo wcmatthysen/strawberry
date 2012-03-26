@@ -32,9 +32,9 @@ import fj.data.Option;
  */
 public final class Types {
     
-    public static final Pattern BOOLEAN = Pattern.compile("^t|true|y|yes|1|f|false|n|no|0$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern BOOLEAN = Pattern.compile("^(?:t|true|y|yes|1|f|false|n|no|0)$", Pattern.CASE_INSENSITIVE);
     
-    public static final Pattern TRUE = Pattern.compile("^t|true|y|yes|1$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern TRUE = Pattern.compile("^(?:t|true|y|yes|1)$", Pattern.CASE_INSENSITIVE);
 
     private Types() { }
     
