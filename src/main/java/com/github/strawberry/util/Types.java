@@ -61,7 +61,7 @@ public final class Types {
         return genericType;
     }
     
-    public static F<Type, Boolean> equals(final Class<?> clazz) {
+    public static F<Type, Boolean> isEqualTo(final Class<?> clazz) {
         return new F<Type, Boolean>(){
             @Override
             public Boolean f(Type type) {
@@ -77,7 +77,7 @@ public final class Types {
         };
     }
     
-    public static F<Type, Boolean> subTypeOf(final Class<?> clazz) {
+    public static F<Type, Boolean> isSubTypeOf(final Class<?> clazz) {
         return new F<Type, Boolean>(){
             @Override
             public Boolean f(Type type) {

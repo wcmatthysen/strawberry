@@ -47,7 +47,9 @@ import static com.github.strawberry.util.JedisUtil.using;
 import static com.github.strawberry.util.Types.BOOLEAN;
 import static com.github.strawberry.util.Types.TRUE;
 import static com.github.strawberry.util.Types.genericTypeOf;
-import static com.github.strawberry.util.Types.subTypeOf;
+import static com.github.strawberry.util.Types.isEqualTo;
+import static com.github.strawberry.util.Types.isSubTypeOf;
+import java.lang.reflect.Type;
 
 /**
  * {@code RedisLoader} is used in conjunction with a {@link CacheBuilder} to
@@ -192,7 +194,8 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                 map.put(key, jedis.get(key));
             } break;
             case HASH: {
-                if (genericTypeOf(field, 1).exists(subTypeOf(Map.class))) {
+                Option<Type> valueType = genericTypeOf(field, 1);
+                if (valueType.exists(isSubTypeOf(Map.class)) || valueType.exists(isEqualTo(Object.class))) {
                     map.put(key, jedis.hgetAll(key));
                 } else {
                     map.putAll(jedis.hgetAll(key));
@@ -219,6 +222,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
             collection = Sets.newLinkedHashSet();
         }
         JedisType jedisType = JedisType.valueOf(jedis.type(key).toUpperCase());
+        Option<Type> genericType = genericTypeOf(field, 0);
         switch (jedisType) {
             case STRING: {
                 collection.add(jedis.get(key));
@@ -227,21 +231,21 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                 collection.add(jedis.hgetAll(key));
             } break;
             case LIST: {
-                if (genericTypeOf(field, 0).exists(subTypeOf(Collection.class))) {
+                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.lrange(key, 0, -1));
                 } else {
                     collection.addAll(jedis.lrange(key, 0, -1));
                 }
             } break;
             case SET: {
-                if (genericTypeOf(field, 0).exists(subTypeOf(Collection.class))) {
+                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.smembers(key));
                 } else {
                     collection.addAll(jedis.smembers(key));
                 }
             } break;
             case ZSET: {
-                if (genericTypeOf(field, 0).exists(subTypeOf(Collection.class))) {
+                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.zrange(key, 0, -1));
                 } else {
                     collection.addAll(jedis.zrange(key, 0, -1));

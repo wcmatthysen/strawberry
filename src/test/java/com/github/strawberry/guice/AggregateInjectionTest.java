@@ -919,6 +919,21 @@ public class AggregateInjectionTest extends AbstractModule {
     }
     
     @Test
+    public void test_that_list_is_injected_into_list_of_objects() {
+        // Test list.
+        List<String> testList = Lists.newArrayList("value_1", "value_2", "value_3");
+        for (String testValue : testList) {
+            this.jedis.rpush("test:heterogeneous:1", testValue);
+        }
+        
+        // Nested list should match expected list.
+        HeterogeneousInListContainer dummy = this.injector.getInstance(HeterogeneousInListContainer.class);
+        List<Object> actualObjects = dummy.getInjectedObjects();
+        assertThat(actualObjects.size(), is(1));
+        assertThat((List<String>)actualObjects.get(0), is(equalTo(testList)));
+    }
+    
+    @Test
     public void test_that_objects_are_injected_into_list_of_objects() {
         // Inject some strings.
         for (int i = 0; i < 3; ++i) {
@@ -1148,6 +1163,23 @@ public class AggregateInjectionTest extends AbstractModule {
         public Map<String, Object> getInjectedObjects() {
             return this.injectedObjects;
         }
+    }
+    
+    @Test
+    public void test_that_map_is_injected_into_map_of_objects() {
+        // Test map.
+        Map<String, String> testMap = ImmutableMap.of(
+            "key_1", "value_1",
+            "key_2", "value_2",
+            "key_3", "value_3"
+        );
+        this.jedis.hmset("test:heterogeneous:1", testMap);
+        
+        // Nested map should match expected map.
+        HeterogeneousInMapContainer dummy = this.injector.getInstance(HeterogeneousInMapContainer.class);
+        Map<String, Object> actualObjects = dummy.getInjectedObjects();
+        assertThat(actualObjects.size(), is(1));
+        assertThat((Map<String, String>)actualObjects.get("test:heterogeneous:1"), is(equalTo(testMap)));
     }
     
     @Test
