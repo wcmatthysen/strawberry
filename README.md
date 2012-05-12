@@ -1,6 +1,5 @@
-strawberry
+strawberry [![Build Status](https://secure.travis-ci.org/wcmatthysen/strawberry.png?branch=master)](http://travis-ci.org/wcmatthysen/strawberry)
 ==========
-[![Build Status](https://secure.travis-ci.org/wcmatthysen/strawberry.png?branch=master)](http://travis-ci.org/wcmatthysen/strawberry)
 A lightweight Java utility library that utilizes [Google Guice](http://code.google.com/p/google-guice) to inject data-structures from a [Redis](http://redis.io) database into object instance fields. The name of the library was roughly constructed as follows: _Red_(is) + _Guice_ = _Strawberry_(-juice). This library should not be seen as an alternative to [Johm](https://github.com/xetorthio/johm) (a very powerful Object-Hash Mapping library) but rather a compliment. Johm is designed for storing (and retrieving) Java objects in Redis, whereas strawberry's main focus is on reading (and caching) configuration values from Redis and injecting these values (which could be list or map structures) into object instance fields.
 
 Installing with Maven
