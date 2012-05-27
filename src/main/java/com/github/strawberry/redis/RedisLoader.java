@@ -18,10 +18,10 @@
 package com.github.strawberry.redis;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,8 +32,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Injector;
 
@@ -46,10 +44,11 @@ import fj.data.Option;
 import static com.github.strawberry.util.JedisUtil.using;
 import static com.github.strawberry.util.Types.BOOLEAN;
 import static com.github.strawberry.util.Types.TRUE;
+import static com.github.strawberry.util.Types.collectionImplementationOf;
 import static com.github.strawberry.util.Types.genericTypeOf;
 import static com.github.strawberry.util.Types.isEqualTo;
-import static com.github.strawberry.util.Types.isSubTypeOf;
-import java.lang.reflect.Type;
+import static com.github.strawberry.util.Types.isAssignableTo;
+import static com.github.strawberry.util.Types.mapImplementationOf;
 
 /**
  * {@code RedisLoader} is used in conjunction with a {@link CacheBuilder} to
@@ -126,18 +125,16 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
             value = 0.0;
         } else if (type.equals(BigDecimal.class)) {
             value = BigDecimal.ZERO;
-        } else if (type.equals(Map.class)) {
-            value = Maps.newLinkedHashMap();
-        } else if (type.equals(List.class)) {
-            value = Lists.newArrayList();
-        } else if (type.equals(Set.class)) {
-            value = Sets.newLinkedHashSet();
+        } else if (Map.class.isAssignableFrom(type)) {
+            value = mapImplementationOf(type);
+        } else if (Collection.class.isAssignableFrom(type)) {
+            value = collectionImplementationOf(type);
         }
         return value;
     }
 
-    private static Map<String, ?> nestedMapOf(Jedis jedis, Set<String> redisKeys) {
-        Map<String, Object> map = Maps.newLinkedHashMap();
+    private static Map<?, ?> nestedMapOf(Field field, Jedis jedis, Set<String> redisKeys) {
+        Map map = mapImplementationOf(field.getType());
         for (String redisKey : redisKeys) {
             JedisType jedisType = JedisType.valueOf(jedis.type(redisKey).toUpperCase());
             switch (jedisType) {
@@ -161,33 +158,33 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
         return map;
     }
 
-    private static List<?> nestedListOf(Jedis jedis, Set<String> redisKeys) {
-        List<Object> list = Lists.newArrayList();
+    private static Collection<?> nestedCollectionOf(Field field, Jedis jedis, Set<String> redisKeys) {
+        Collection collection = collectionImplementationOf(field.getType());
         for (String redisKey : redisKeys) {
             JedisType jedisType = JedisType.valueOf(jedis.type(redisKey).toUpperCase());
             switch (jedisType) {
                 case STRING: {
-                    list.add(jedis.get(redisKey));
+                    collection.add(jedis.get(redisKey));
                 } break;
                 case HASH: {
-                    list.add(jedis.hgetAll(redisKey));
+                    collection.add(jedis.hgetAll(redisKey));
                 } break;
                 case LIST: {
-                    list.add(jedis.lrange(redisKey, 0, -1));
+                    collection.add(jedis.lrange(redisKey, 0, -1));
                 } break;
                 case SET: {
-                    list.add(jedis.smembers(redisKey));
+                    collection.add(jedis.smembers(redisKey));
                 } break;
                 case ZSET: {
-                    list.add(jedis.zrange(redisKey, 0, -1));
+                    collection.add(jedis.zrange(redisKey, 0, -1));
                 } break;
             }
         }
-        return list;
+        return collection;
     }
     
-    private static Map<String, ?> mapOf(Field field, Jedis jedis, String key) {
-        Map<String, Object> map = Maps.newLinkedHashMap();
+    private static Map<?, ?> mapOf(Field field, Jedis jedis, String key) {
+        Map map = mapImplementationOf(field.getType());
         JedisType jedisType = JedisType.valueOf(jedis.type(key).toUpperCase());
         switch (jedisType) {
             case STRING: {
@@ -195,7 +192,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
             } break;
             case HASH: {
                 Option<Type> valueType = genericTypeOf(field, 1);
-                if (valueType.exists(isSubTypeOf(Map.class)) || valueType.exists(isEqualTo(Object.class))) {
+                if (valueType.exists(isAssignableTo(Map.class)) || valueType.exists(isEqualTo(Object.class))) {
                     map.put(key, jedis.hgetAll(key));
                 } else {
                     map.putAll(jedis.hgetAll(key));
@@ -215,12 +212,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
     }
 
     private static Collection<?> collectionOf(Field field, Jedis jedis, String key) {
-        Collection<Object> collection = null;
-        if (field.getType().equals(List.class)) {
-            collection = Lists.newArrayList();
-        } else if (field.getType().equals(Set.class)) {
-            collection = Sets.newLinkedHashSet();
-        }
+        Collection collection = collectionImplementationOf(field.getType());
         JedisType jedisType = JedisType.valueOf(jedis.type(key).toUpperCase());
         Option<Type> genericType = genericTypeOf(field, 0);
         switch (jedisType) {
@@ -231,21 +223,21 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                 collection.add(jedis.hgetAll(key));
             } break;
             case LIST: {
-                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
+                if (genericType.exists(isAssignableTo(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.lrange(key, 0, -1));
                 } else {
                     collection.addAll(jedis.lrange(key, 0, -1));
                 }
             } break;
             case SET: {
-                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
+                if (genericType.exists(isAssignableTo(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.smembers(key));
                 } else {
                     collection.addAll(jedis.smembers(key));
                 }
             } break;
             case ZSET: {
-                if (genericType.exists(isSubTypeOf(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
+                if (genericType.exists(isAssignableTo(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
                     collection.add(jedis.zrange(key, 0, -1));
                 } else {
                     collection.addAll(jedis.zrange(key, 0, -1));
@@ -267,7 +259,7 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                 String pattern = annotation.value();
                 boolean allowNull = annotation.allowNull();
 
-                Set<String> redisKeys = jedis.keys(pattern);
+                Set<String> redisKeys = Sets.newTreeSet(jedis.keys(pattern));
                 if (redisKeys.size() == 1) {
                     String redisKey = Iterables.getOnlyElement(redisKeys);
                     if (fieldType.equals(char[].class)) {
@@ -294,9 +286,9 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         } else {
                             throw ConversionException.of(toConvert, redisKey, fieldType);
                         }
-                    } else if (fieldType.equals(Map.class)) {
+                    } else if (Map.class.isAssignableFrom(fieldType)) {
                         value = mapOf(field, jedis, redisKey);
-                    } else if (fieldType.equals(List.class) || fieldType.equals(Set.class)) {
+                    } else if (Collection.class.isAssignableFrom(fieldType)) {
                         value = collectionOf(field, jedis, redisKey);
                     } else {
                         String toConvert = jedis.get(redisKey);
@@ -323,10 +315,11 @@ public final class RedisLoader extends CacheLoader<Field, Option> {
                         }
                     }
                 } else if (redisKeys.size() > 1) {
-                    if (fieldType.equals(List.class)) {
-                        value = nestedListOf(jedis, redisKeys);
-                    } else if (fieldType.equals(Map.class)) {
-                        value = nestedMapOf(jedis, redisKeys);
+                    if (Map.class.isAssignableFrom(fieldType)) {
+                        value = nestedMapOf(field, jedis, redisKeys);
+                    }
+                    else if (Collection.class.isAssignableFrom(fieldType)) {
+                        value = nestedCollectionOf(field, jedis, redisKeys);
                     }
                 } else {
                     if (!allowNull) {

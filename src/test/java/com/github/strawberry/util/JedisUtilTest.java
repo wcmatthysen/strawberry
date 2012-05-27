@@ -38,7 +38,7 @@ import static com.github.strawberry.util.JedisUtil.using;
  */
 public class JedisUtilTest {
     
-    public static class CustomException extends RuntimeException {
+    private static class CustomException extends RuntimeException {
         
         private final Jedis jedis;
         
