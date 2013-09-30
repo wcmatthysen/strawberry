@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.strawberry.redis;
+package com.github.strawberry.guice;
 
 /**
  *
@@ -23,19 +23,19 @@ package com.github.strawberry.redis;
  */
 public final class ConversionException extends RuntimeException {
 
-    ConversionException(String message, Throwable cause) {
+    public ConversionException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    ConversionException(String message) {
+    public ConversionException(String message) {
         super(message);
     }
 
-    static ConversionException of(Exception cause, String toConvert, String key, Class<?> type) {
+    public static ConversionException of(Exception cause, String toConvert, String key, Class<?> type) {
         return new ConversionException(String.format("Cannot convert value: (%s) at key: (%s) to %s.", toConvert, key, type), cause);
     }
 
-    static ConversionException of(String toConvert, String key, Class<?> type) {
+    public static ConversionException of(String toConvert, String key, Class<?> type) {
         return new ConversionException(String.format("Cannot convert value: (%s) at key: (%s) to %s.", toConvert, key, type));
     }
 }

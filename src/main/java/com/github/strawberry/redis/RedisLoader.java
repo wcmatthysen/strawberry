@@ -17,6 +17,7 @@
  */
 package com.github.strawberry.redis;
 
+import com.github.strawberry.guice.ConversionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
