@@ -109,9 +109,13 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
             } else if (fieldType.equals(String.class)) {
                 value = properties.get(matchingKey);
             } else if (fieldType.equals(byte[].class)) {
-                value = properties.get(matchingKey.getBytes());
+                if (properties.containsKey(matchingKey)) {
+                    value = properties.get(matchingKey).toString().getBytes();
+                } else {
+                    value = null;
+                }
             } else if (fieldType.equals(Byte[].class)) {
-                value = ArrayUtils.toObject(properties.get(matchingKey.getBytes()).toString().getBytes());
+                value = ArrayUtils.toObject(properties.get(matchingKey).toString().getBytes());
             } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                 String toConvert = properties.get(matchingKey).toString();
                 if (BOOLEAN.matcher(toConvert).matches()) {
