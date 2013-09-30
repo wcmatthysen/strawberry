@@ -42,7 +42,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.base.Joiner;
 import java.util.Properties;
 
 /**
@@ -106,7 +105,7 @@ public class ListInjectionTest extends AbstractModule {
     @Test
     public void test_that_list_is_injected_into_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         ListContainer dummy = this.injector.getInstance(ListContainer.class);
         assertThat(dummy.getInjectedList(), is(equalTo(expectedList)));
     }
@@ -135,7 +134,7 @@ public class ListInjectionTest extends AbstractModule {
         // Test for case where value is present in redis database.
         // Default value should be overwritten.
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         dummy = this.injector.getInstance(ListDefaultValueContainer.class);
         assertThat(dummy.getInjectedList(), is(equalTo(expectedList)));
     }
@@ -155,7 +154,7 @@ public class ListInjectionTest extends AbstractModule {
     @Test
     public void test_that_list_is_injected_into_set() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         ListAsSetContainer dummy = this.injector.getInstance(ListAsSetContainer.class);
         Set<String> actualSet = dummy.getInjectedSet();
         assertThat(actualSet, is(equalTo((Set)Sets.newHashSet(expectedList))));
@@ -176,7 +175,7 @@ public class ListInjectionTest extends AbstractModule {
     @Test
     public void test_that_list_is_injected_into_map_of_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         ListInMapContainer dummy = this.injector.getInstance(ListInMapContainer.class);
         Map<String, List<String>> actualMapList = dummy.getInjectedList();
         assertThat(actualMapList.size(), is(1));
@@ -198,7 +197,7 @@ public class ListInjectionTest extends AbstractModule {
     @Test
     public void test_that_list_is_injected_into_list_of_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         ListInListContainer dummy = this.injector.getInstance(ListInListContainer.class);
         List<List<String>> actualListList = dummy.getInjectedList();
         assertThat(actualListList.size(), is(1));
@@ -220,7 +219,7 @@ public class ListInjectionTest extends AbstractModule {
     @Test
     public void test_that_list_is_injected_into_set_of_list() {
         List<String> expectedList = Lists.newArrayList("value_01", "value_02", "value_03");
-        properties.put("test:list",Joiner.on(",").join(expectedList));
+        properties.put("test:list",expectedList);
         ListInSetContainer dummy = this.injector.getInstance(ListInSetContainer.class);
         Set<List<String>> actualSetList = dummy.getInjectedList();
         assertThat(actualSetList.size(), is(1));

@@ -49,8 +49,11 @@ import redis.clients.jedis.JedisPool;
 
 import fj.data.Option;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -63,7 +66,7 @@ import redis.clients.jedis.Jedis;
  */
 public final class ConfigLoader extends CacheLoader<Field, Option> {
 
-    private final Properties properties;
+    private final Map properties;
 
     /**
      * Internal enum to match against all supported Redis data types.
@@ -74,7 +77,7 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
      * database.
      * @param pool The pool of connections to a Redis database.
      */
-    public ConfigLoader(Properties properties) {
+    public ConfigLoader(Map properties) {
         this.properties = properties;
     }
 
@@ -84,7 +87,7 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
     }
 
 
-    private static Option getFromProperties(Properties properties, final Field field, final Config annotation) {
+    private static Option getFromProperties(Map properties, final Field field, final Config annotation) {
 
         Object value = null;
         
@@ -167,11 +170,26 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
         return Option.fromNull(value);
     }
 
-    private static Set<String> getKeys(Properties properties, String pattern) {
-        if (properties.containsKey(pattern)) {
-            return Sets.newHashSet(pattern);
+    private static Set<String> getKeys(Map properties, String pattern) {
+        if (pattern.indexOf("*")== -1) {
+            if (properties.containsKey(pattern)) {
+                return Sets.newHashSet(pattern);
+            } else {
+                return Sets.newHashSet();
+            }
         } else {
-            return Sets.newHashSet();
+            Set keys = Sets.newHashSet();
+            pattern = pattern.replace("*","(.*)");
+            Pattern p = Pattern.compile(pattern);
+            for (Object kk : properties.keySet()) {
+                String k = kk.toString();
+                Matcher m = p.matcher(k);
+                if (m.matches()) {
+                    keys.add(kk);
+                }
+
+            }
+            return keys;
         }
     }
 
@@ -224,7 +242,7 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
         return value;
     }
 
-    private static Map<?, ?> nestedMapOf(Field field, Properties properties, Set<String> redisKeys) {
+    private static Map<?, ?> nestedMapOf(Field field, Map properties, Set<String> redisKeys) {
         Map map = mapImplementationOf(field.getType());
         for (String redisKey : redisKeys) {
             map.put(redisKey, properties.get(redisKey));
@@ -232,7 +250,7 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
         return map;
     }
 
-    private static Collection<?> nestedCollectionOf(Field field, Properties properties, Set<String> redisKeys) {
+    private static Collection<?> nestedCollectionOf(Field field, Map properties, Set<String> redisKeys) {
         Collection collection = collectionImplementationOf(field.getType());
         for (String redisKey : redisKeys) {
             collection.add(properties.get(redisKey));
@@ -240,17 +258,46 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
         return collection;
     }
     
-    private static Map<?, ?> mapOf(Field field, Properties properties, String key) {
+    private static Map<?, ?> mapOf(Field field, Map properties, String key) {
         Map map = mapImplementationOf(field.getType());
-        map.put(key, properties.get(key));
+
+        Object o = properties.get(key);
+        if (o instanceof Map) {
+            Option<Type> valueType = genericTypeOf(field, 1);
+            if (valueType.exists(isAssignableTo(Map.class)) || valueType.exists(isEqualTo(Object.class))) {
+                map.put(key, o);
+            } else {
+                map.putAll((Map)o);
+            }
+        } else {
+            map.put(key, o);
+        }
+
         return map;
     }
 
-    private static Collection<?> collectionOf(Field field, Properties properties, String key) {
+    private static Collection<?> collectionOf(Field field, Map properties, String key) {
         Collection collection = collectionImplementationOf(field.getType());
         Object list = properties.get(key);
+        Option<Type> genericType = genericTypeOf(field, 0);
         if (list != null) {
-            collection.addAll(Lists.newArrayList(properties.get(key).toString().split(",")));
+            if (list instanceof List) {
+                if (genericType.exists(isAssignableTo(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
+                    collection.add(list);
+                } else {
+                    collection.addAll((List)list);
+                }
+            } else if (list instanceof Collection) {
+                if (genericType.exists(isAssignableTo(Collection.class)) || genericType.exists(isEqualTo(Object.class))) {
+                    collection.add(list);
+                } else {
+                    collection.addAll((Collection)list);
+                }
+            } else if (list instanceof Map) {
+                collection.add(((Map)list));
+            } else {
+                collection.add(list);
+            }
             return collection;
         } else {
             return collection;
