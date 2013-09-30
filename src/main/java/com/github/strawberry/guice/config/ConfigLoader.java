@@ -41,6 +41,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Injector;
 
@@ -247,8 +248,13 @@ public final class ConfigLoader extends CacheLoader<Field, Option> {
 
     private static Collection<?> collectionOf(Field field, Properties properties, String key) {
         Collection collection = collectionImplementationOf(field.getType());
-        collection.add(properties.get(key));
-        return collection;
+        Object list = properties.get(key);
+        if (list != null) {
+            collection.addAll(Lists.newArrayList(properties.get(key).toString().split(",")));
+            return collection;
+        } else {
+            return collection;
+        }
     }
 
 }
