@@ -28,6 +28,7 @@ import com.google.inject.Module;
 import com.google.inject.matcher.Matchers;
 
 import fj.data.Option;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -107,7 +108,7 @@ public final class ConfigModule extends AbstractModule {
      * {@code JedisPool} of connections to a Redis database. 
      * @param pool The pool of connections to a Redis database.
      */
-    public ConfigModule(Properties properties) {
+    public ConfigModule(Map properties) {
         
         // This constructor would be called in situations where caching of
         // Redis field-values are not important, and the latest most up-to-date
