@@ -43,6 +43,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 import static com.github.strawberry.util.JedisUtil.destroyOnShutdown;
+import com.google.common.collect.Maps;
 import java.util.Properties;
 
 /**
@@ -230,5 +231,25 @@ public class MapInjectionTest extends AbstractModule {
         Set<Map<String, String>> actualMapSet = dummy.getInjectedMap();
         assertThat(actualMapSet.size(), is(1));
         assertThat(Iterables.getOnlyElement(actualMapSet), is(equalTo(expectedMap)));
+    }
+
+    public static class NullMapContainer {
+        
+        @Config(value = "test:map",allowNull = false)
+        private Map<String, String> injectedMap;
+        
+        public Map<String, String> getInjectedMap() {
+            return this.injectedMap;
+        }
+    }
+    
+    @Test
+    public void test_that_null_is_not_injected_if_key_not_present() {
+        this.properties.clear();
+        NullMapContainer dummy = this.injector.getInstance(NullMapContainer.class);
+        Map<String, String> actualMapSet = dummy.getInjectedMap();
+        Map<String, String> expectedMap = Maps.newHashMap();
+        assertThat(actualMapSet.size(), is(0));
+        assertThat(actualMapSet, is(equalTo(expectedMap)));
     }
 }
